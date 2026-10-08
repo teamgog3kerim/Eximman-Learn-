@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, Cambria, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --bg-natural: #FAF9F5;
+    --text-natural: #1C1917;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-natural);
+    color: var(--text-natural);
+    letter-spacing: -0.011em;
+  }
+}
+
+.dark body {
+  background-color: #121212;
+  color: #F5F5F4;
+}
+
+.font-serif-title {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.font-mono-numbers {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Custom delicate scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 130, 120, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 130, 120, 0.4);
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .certificate-print-wrapper {
+    border: 4px solid #78350f !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    background: white !important;
+    color: black !important;
+  }
+}
