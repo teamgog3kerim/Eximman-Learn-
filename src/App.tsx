@@ -6,6 +6,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
+import { LearningDashboard } from './components/LearningDashboard';
 import { CourseViewer } from './components/CourseViewer';
 import { CostBreakdownSheet } from './components/CostBreakdownSheet';
 import { LCCalculator } from './components/LCCalculator';
@@ -17,24 +18,42 @@ import { ResourceLibrary } from './components/ResourceLibrary';
 import { RecordsTracker } from './components/RecordsTracker';
 import { CertificationView } from './components/CertificationView';
 import { SubscriptionModal } from './components/SubscriptionModal';
-import { Shield, Sparkles, BookOpen, Clock, HeartHandshake } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
+
+const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
 const MainContent: React.FC = () => {
   const {
-    activeNavTab,
-    setActiveNavTab,
-    currentUser,
-    hasFullAccess,
-    showPaywallModal,
-    setShowPaywallModal
+    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal
   } = useApp();
+  const isTool = toolTabs.includes(activeNavTab);
+  const isSubscription = activeNavTab === 'subscription';
+  const showAdmin = activeNavTab === 'admin' && isAdmin;
 
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors">
+    <div className="academy-shell flex min-h-[100dvh] flex-col transition-colors">
       <Navbar />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="no-print border-b border-[#ead7bb] bg-[#fff5e8] px-4 py-2.5 text-[#6b4c2b] dark:border-[#574633] dark:bg-[#392e22] dark:text-[#e9c99f]">
+        <p className="mx-auto flex max-w-[1440px] items-start gap-2 text-[11px] leading-4 sm:items-center sm:text-xs">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" />
+          <span><strong>Demo workspace.</strong> Account and payment data is stored in this browser; no real payments are verified. Do not send money based on this demo.</span>
+        </p>
+      </div>
+
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
+        {isTool && (
+          <div role="note" className="mb-5 flex gap-2.5 rounded-xl border border-[#e8d6be] bg-[#fff8ee] px-4 py-3 text-xs leading-5 text-[#705634] dark:border-[#574633] dark:bg-[#30291f] dark:text-[#ddc59f]">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <p><strong>Educational estimates only.</strong> Verify current regulations and exchange rates with relevant authorities, banks and qualified professionals before making decisions.</p>
+          </div>
+        )}
+        {isSubscription && (
+          <div role="note" className="mb-5 rounded-xl border border-[#e8d6be] bg-[#fff8ee] px-4 py-3 text-xs leading-5 text-[#705634] dark:border-[#574633] dark:bg-[#30291f] dark:text-[#ddc59f]">
+            Pricing information is retained as business content. Subscription and payment actions are demo-only; no payment is verified or processed here.
+          </div>
+        )}
+        {(activeNavTab as string) === 'overview' && <LearningDashboard />}
         {activeNavTab === 'curriculum' && <CourseViewer />}
         {activeNavTab === 'resources' && <ResourceLibrary />}
         {activeNavTab === 'progress' && <RecordsTracker />}
@@ -44,32 +63,22 @@ const MainContent: React.FC = () => {
         {activeNavTab === 'tax_calculator' && <TaxAssessmentCalculator />}
         {activeNavTab === 'quiz_center' && <QuizCenter />}
         {activeNavTab === 'subscription' && <SubscriptionView />}
-        {activeNavTab === 'admin' && <AdminDashboard />}
+        {showAdmin && <AdminDashboard />}
+        {activeNavTab === 'admin' && !isAdmin && <LearningDashboard />}
       </main>
 
-      {/* Modal for payment / subscription */}
-      <SubscriptionModal
-        isOpen={showPaywallModal}
-        onClose={() => setShowPaywallModal(false)}
-      />
+      <SubscriptionModal isOpen={showPaywallModal} onClose={() => setShowPaywallModal(false)} />
 
-      {/* Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-8 text-xs text-neutral-500 dark:text-neutral-400 no-print mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-serif-title text-sm font-bold text-neutral-900 dark:text-neutral-100">
-              Ethiopian Import Export & Logistics Academy
-            </span>
-            <span>·</span>
-            <span>Program Lead: Abdulkerim (0967684490)</span>
+      <footer className="no-print mt-8 border-t academy-line bg-[var(--paper)] py-6">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 text-[11px] sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8">
+          <div>
+            <p className="font-serif-title text-sm font-extrabold">Ethiopian Import Export & Logistics Academy</p>
+            <p className="mt-1 academy-muted">A practical learning workspace for trade and logistics professionals.</p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-4 text-[11px]">
-            <span>Fee: 3,900 ETB / 30 Days</span>
-            <span>·</span>
-            <span>Telebirr to 0967684490 (Abdulkerim)</span>
-            <span>·</span>
-            <span>Djibouti-Addis Logistics Corridor Framework</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 academy-muted">
+            <span>Business pricing: 3,900 ETB / 30 days</span>
+            <span className="hidden sm:inline">·</span>
+            <span>Local demo only · no payments verified</span>
           </div>
         </div>
       </footer>

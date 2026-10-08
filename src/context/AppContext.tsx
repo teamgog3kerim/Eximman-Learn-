@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, SubscriptionStatus } from '../types';
+import { COURSE_MODULES } from '../data/courseData';
 
 export type NavTabType =
+  | 'overview'
   | 'curriculum'
   | 'lc_calculator'
   | 'landed_cost'
@@ -54,6 +56,17 @@ const STORAGE_KEY_USERS = 'ethio_impex_users_v3';
 const STORAGE_KEY_CURRENT_USER = 'ethio_impex_curr_user_v3';
 const STORAGE_KEY_THEME = 'ethio_impex_theme';
 const STORAGE_KEY_QUIZ_SCORES = 'ethio_impex_quiz_scores_v3';
+const STORAGE_KEY_USER_QUIZZES = 'ethio_impex_user_quizzes_v1';
+type QuizScores = Record<string, { score: number; maxScore: number; date: string }>;
+const ALL_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
+const CHAPTER_IDS = new Set(ALL_CHAPTERS.map(chapter => chapter.id));
+const saveLocal = (key: string, value: string) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    window.dispatchEvent(new Event('academy-storage-error'));
+  }
+};
 
 const ALL_16_CHAPTER_IDS = [
   'ch-1', 'ch-2', 'ch-3', 'ch-4', 'ch-5', 'ch-6',
@@ -130,7 +143,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [users, setUsers] = useState<UserProfile[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_USERS);
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length && parsed.every(user =>
+          typeof user.id === 'string' && typeof user.fullName === 'string' &&
+          ['user', 'admin'].includes(user.role) &&
+          (!user.completedChapters || Array.isArray(user.completedChapters))
+        )) return parsed;
+      }
     } catch (e) {
       console.error(e);
     }
@@ -157,36 +177,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return 'light';
   });
 
-  const [activeNavTab, setActiveNavTab] = useState<NavTabType>('curriculum');
+  const [activeNavTab, setActiveNavTab] = useState<NavTabType>('overview');
   const [selectedChapterId, setSelectedChapterId] = useState<string>('ch-1');
   const [showPaywallModal, setShowPaywallModal] = useState<boolean>(false);
 
-  const [quizScores, setQuizScores] = useState<Record<string, { score: number; maxScore: number; date: string }>>(() => {
+  const [userQuizScores, setUserQuizScores] = useState<Record<string, QuizScores>>(() => {
     try {
+      const scoped = localStorage.getItem(STORAGE_KEY_USER_QUIZZES);
+      if (scoped) {
+        const parsed = JSON.parse(scoped);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+      }
       const stored = localStorage.getItem(STORAGE_KEY_QUIZ_SCORES);
-      if (stored) return JSON.parse(stored);
+      if (stored) return { 'user-01': JSON.parse(stored) };
     } catch (e) {
       console.error(e);
     }
-    return {
-      'ch-1': { score: 3, maxScore: 3, date: '2026-10-06' }
-    };
+    return {};
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+    saveLocal(STORAGE_KEY_USERS, JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_CURRENT_USER, currentUserId);
+    saveLocal(STORAGE_KEY_CURRENT_USER, currentUserId);
   }, [currentUserId]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_QUIZ_SCORES, JSON.stringify(quizScores));
-  }, [quizScores]);
+    saveLocal(STORAGE_KEY_USER_QUIZZES, JSON.stringify(userQuizScores));
+  }, [userQuizScores]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_THEME, theme);
+    saveLocal(STORAGE_KEY_THEME, theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -199,6 +222,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const currentUser = users.find(u => u.id === currentUserId) || users[0] || SEED_USERS[0];
+  const quizScores = userQuizScores[currentUser.id] || {};
   const isAdmin = currentUser.role === 'admin';
 
   const isSubscriptionValid = () => {
@@ -211,18 +235,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const hasFullAccess = isAdmin || isSubscriptionValid();
 
   // Progress logic
-  const completedChapters = currentUser.completedChapters || [];
+  const completedChapters = [...new Set(currentUser.completedChapters || [])].filter(id => CHAPTER_IDS.has(id));
   const completedChaptersCount = completedChapters.length;
-  const progressPercentage = Math.round((completedChaptersCount / 16) * 100);
+  const progressPercentage = Math.round((completedChaptersCount / ALL_CHAPTERS.length) * 100);
 
   const isChapterCompleted = (chapterId: string) => {
     return completedChapters.includes(chapterId);
   };
 
   const toggleChapterComplete = (chapterId: string) => {
+    const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
+    if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible)) return;
     setUsers(prev =>
       prev.map(u => {
-        if (u.id === currentUserId) {
+        if (u.id === currentUser.id) {
           const currentList = u.completedChapters || [];
           const exists = currentList.includes(chapterId);
           const updated = exists
@@ -240,10 +266,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const recordQuizScore = (chapterId: string, score: number, maxScore: number) => {
+    const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
+    if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible) ||
+      !Number.isInteger(score) || maxScore !== chapter.quiz.length || maxScore < 1 ||
+      score < 0 || score > maxScore) return;
     const today = new Date().toISOString().split('T')[0];
-    setQuizScores(prev => ({
+    setUserQuizScores(prev => ({
       ...prev,
-      [chapterId]: { score, maxScore, date: today }
+      [currentUser.id]: {
+        ...prev[currentUser.id],
+        [chapterId]: { score, maxScore, date: today }
+      }
     }));
 
     // Auto-mark chapter as complete if passed with 60%+ score
@@ -255,7 +288,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const issueCertificate = () => {
-    const certCode = `ET-IMPEX-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    if (completedChaptersCount !== ALL_CHAPTERS.length) return;
+    const certCode = `ET-IMPEX-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const now = new Date().toISOString();
 
     setUsers(prev =>
@@ -320,6 +354,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adminApproveUser = (userId: string, days: number = 30) => {
+    if (!isAdmin || !Number.isInteger(days) || days < 1) return;
     const now = new Date();
     const expiry = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
     setUsers(prev =>
@@ -339,6 +374,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adminRejectUser = (userId: string, reason?: string) => {
+    if (!isAdmin) return;
     setUsers(prev =>
       prev.map(u => {
         if (u.id === userId) {
@@ -354,6 +390,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adminExtendUser = (userId: string, days: number = 30) => {
+    if (!isAdmin || !Number.isInteger(days) || days < 1) return;
     setUsers(prev =>
       prev.map(u => {
         if (u.id === userId) {
@@ -373,7 +410,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const switchUser = (userId: string) => {
+    if (!users.some(user => user.id === userId)) return;
     setCurrentUserId(userId);
+    setActiveNavTab('overview');
   };
 
   const loginAsAdmin = () => {
