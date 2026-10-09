@@ -63,7 +63,7 @@ export const RecordsTracker: React.FC = () => {
     return true;
   });
 
-  const isEligibleForCert = completedChaptersCount === 16 || currentUser.completedChapters?.length === 16 || currentUser.role === 'admin';
+  const isEligibleForCert = completedChaptersCount === allChapters.length;
 
   const handlePrint = () => {
     window.print();
@@ -77,7 +77,7 @@ export const RecordsTracker: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
               <FileCheck className="w-4 h-4" />
-              <span>Official Academic Record & Progress Transcript</span>
+              <span>Local learning progress tracker · demo</span>
             </div>
 
             <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
@@ -87,10 +87,10 @@ export const RecordsTracker: React.FC = () => {
             <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-neutral-400" />
-                <span>{currentUser.email}</span>
+                <span>{currentUser.email || 'No email saved'}</span>
               </span>
               <span>·</span>
-              <span>Mobile: {currentUser.phoneNumber}</span>
+              {currentUser.phoneNumber && <span>Mobile: {currentUser.phoneNumber}</span>}
               <span>·</span>
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-neutral-400" />
@@ -132,7 +132,7 @@ export const RecordsTracker: React.FC = () => {
               className="py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Official Transcript</span>
+              <span>Print progress summary</span>
             </button>
 
             <button
@@ -227,12 +227,12 @@ export const RecordsTracker: React.FC = () => {
               </span>
             ) : (
               <span className="text-amber-600 dark:text-amber-400">
-                {16 - completedChaptersCount} Chapters Left
+                {allChapters.length - completedChaptersCount} lessons left
               </span>
             )}
           </div>
           <p className="text-[11px] text-neutral-500 mt-1">
-            Executive Certificate with verification ID
+            Local course-completion record · not a verified qualification
           </p>
         </div>
       </div>
@@ -300,7 +300,7 @@ export const RecordsTracker: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 dark:border-neutral-800">
           <div>
             <h2 className="text-lg font-serif-title font-bold text-neutral-900 dark:text-neutral-100">
-              16-Chapter Master Ledger & Verification Record
+              Lesson completion tracker · demo
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               Track completion, review quiz examination scores, and manage your course milestones.
@@ -317,7 +317,7 @@ export const RecordsTracker: React.FC = () => {
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
               }`}
             >
-              All (16)
+          All ({allChapters.length})
             </button>
             <button
               onClick={() => setFilter('completed')}
@@ -418,7 +418,7 @@ export const RecordsTracker: React.FC = () => {
                           onClick={() => setShowPaywallModal(true)}
                           className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-700 hover:bg-amber-800 text-white transition-colors"
                         >
-                          Unlock
+                          View demo pricing
                         </button>
                       ) : (
                         <>

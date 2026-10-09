@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
 import { LearningDashboard } from './components/LearningDashboard';
@@ -26,6 +26,13 @@ const MainContent: React.FC = () => {
   const {
     activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal
   } = useApp();
+  const [storageWarning, setStorageWarning] = useState(false);
+
+  useEffect(() => {
+    const warn = () => setStorageWarning(true);
+    window.addEventListener('academy-storage-error', warn);
+    return () => window.removeEventListener('academy-storage-error', warn);
+  }, []);
   const isTool = toolTabs.includes(activeNavTab);
   const isSubscription = activeNavTab === 'subscription';
   const showAdmin = activeNavTab === 'admin' && isAdmin;
@@ -34,10 +41,16 @@ const MainContent: React.FC = () => {
     <div className="academy-shell flex min-h-[100dvh] flex-col transition-colors">
       <Navbar />
 
+      {storageWarning && (
+        <div role="alert" className="border-b border-rose-300 bg-rose-50 px-4 py-2.5 text-xs leading-5 text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-100">
+          <p className="mx-auto max-w-[1440px]"><strong>Browser storage is unavailable or full.</strong> Your latest progress may not persist after closing this page.</p>
+        </div>
+      )}
+
       <div className="no-print border-b border-[#ead7bb] bg-[#fff5e8] px-4 py-2.5 text-[#6b4c2b] dark:border-[#574633] dark:bg-[#392e22] dark:text-[#e9c99f]">
         <p className="mx-auto flex max-w-[1440px] items-start gap-2 text-[11px] leading-4 sm:items-center sm:text-xs">
           <Info className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" />
-          <span><strong>Demo workspace.</strong> Account and payment data is stored in this browser; no real payments are verified. Do not send money based on this demo.</span>
+          <span><strong>Demo workspace.</strong> Sample accounts and learning progress stay in this browser; no payments are processed or verified. Do not send money based on this demo.</span>
         </p>
       </div>
 

@@ -254,7 +254,7 @@ export const ExportDocumentChecklistGenerator: React.FC<Props> = ({
               Export Document Checklist Generator
             </h2>
             <p className="text-sm text-neutral-300 leading-relaxed">
-              Dynamically generates the verified, step-by-step statutory document package required for your exact export commodity, target destination market, transport corridor, and payment terms under Ethiopian trade law.
+              Builds an educational checklist from the sample data bundled with this demo. Requirements can change and have not been verified against current laws, destination rules, or official procedures. Confirm every item with the responsible authorities and qualified trade advisers before export.
             </p>
           </div>
 

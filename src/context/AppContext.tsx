@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, SubscriptionStatus } from '../types';
+import { UserProfile } from '../types';
 import { COURSE_MODULES } from '../data/courseData';
 
 export type NavTabType =
@@ -20,15 +20,6 @@ interface AppContextType {
   users: UserProfile[];
   theme: 'light' | 'dark';
   toggleTheme: () => void;
-  registerUser: (data: {
-    fullName: string;
-    phoneNumber: string;
-    email: string;
-    isPaid: boolean;
-    telebirrTxId?: string;
-    paymentScreenshot?: string;
-  }) => UserProfile;
-  submitPayment: (telebirrTxId: string, paymentScreenshot?: string) => void;
   adminApproveUser: (userId: string, days?: number) => void;
   adminRejectUser: (userId: string, reason?: string) => void;
   adminExtendUser: (userId: string, days?: number) => void;
@@ -68,72 +59,30 @@ const saveLocal = (key: string, value: string) => {
   }
 };
 
-const ALL_16_CHAPTER_IDS = [
-  'ch-1', 'ch-2', 'ch-3', 'ch-4', 'ch-5', 'ch-6',
-  'ch-7', 'ch-8', 'ch-9', 'ch-10', 'ch-11', 'ch-12',
-  'ch-13', 'ch-14', 'ch-15', 'ch-16'
-];
-
 const SEED_USERS: UserProfile[] = [
   {
     id: 'admin-01',
-    fullName: 'Abdulkerim (Program Director & Lead Specialist)',
-    phoneNumber: '0967684490',
-    email: 'abdulkerim@ethio-impex.com',
+    fullName: 'Demo Administrator',
+    phoneNumber: '',
+    email: 'admin@example.invalid',
     role: 'admin',
-    subscriptionStatus: 'active_paid',
-    registeredAt: '2026-09-01T08:00:00.000Z',
-    expiresAt: '2028-12-31T23:59:59.000Z',
-    paymentAmount: 3900,
-    approvedAt: '2026-09-01T08:00:00.000Z',
-    notes: 'Program Director & Telebirr 0967684490 Recipient',
-    completedChapters: ALL_16_CHAPTER_IDS,
-    certificateId: 'ET-IMPEX-2026-MASTER-001',
-    certificateIssuedAt: '2026-09-05T12:00:00.000Z'
+    subscriptionStatus: 'free_trial',
+    registeredAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: null,
+    paymentAmount: 0,
+    completedChapters: []
   },
   {
     id: 'user-01',
-    fullName: 'Dawit Bekele',
-    phoneNumber: '0911223344',
-    email: 'dawit.trade@gmail.com',
+    fullName: 'Demo Learner',
+    phoneNumber: '',
+    email: 'learner@example.invalid',
     role: 'user',
     subscriptionStatus: 'free_trial',
-    registeredAt: '2026-10-06T10:15:00.000Z',
+    registeredAt: '2026-01-01T00:00:00.000Z',
     expiresAt: null,
     paymentAmount: 0,
-    notes: 'Testing free trial (Module 1, Ch 1 & 2)',
-    completedChapters: ['ch-1']
-  },
-  {
-    id: 'user-02',
-    fullName: 'Hiwot Tesfaye',
-    phoneNumber: '0922334455',
-    email: 'hiwot.logistics@gmail.com',
-    role: 'user',
-    subscriptionStatus: 'pending_approval',
-    registeredAt: '2026-10-07T14:30:00.000Z',
-    expiresAt: null,
-    telebirrTxId: 'TB-9823419082',
-    paymentAmount: 3900,
-    notes: 'Paid 3,900 ETB to 0967684490 (Abdulkerim). Awaiting approval.',
-    completedChapters: ['ch-1', 'ch-2']
-  },
-  {
-    id: 'user-03',
-    fullName: 'Solomon Girma',
-    phoneNumber: '0933445566',
-    email: 'solomon.coffee.export@gmail.com',
-    role: 'user',
-    subscriptionStatus: 'active_paid',
-    registeredAt: '2026-09-20T09:00:00.000Z',
-    expiresAt: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString(),
-    telebirrTxId: 'TB-7744119932',
-    paymentAmount: 3900,
-    approvedAt: '2026-09-20T09:30:00.000Z',
-    notes: 'Active subscriber (All 16 Chapters Completed · Certified)',
-    completedChapters: ALL_16_CHAPTER_IDS,
-    certificateId: 'ET-IMPEX-2026-8841',
-    certificateIssuedAt: '2026-10-04T16:30:00.000Z'
+    completedChapters: []
   }
 ];
 
@@ -164,7 +113,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (e) {
       console.error(e);
     }
-    return 'user-01'; // Default to free trial student
+    return 'user-01';
   });
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -306,53 +255,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
-  const registerUser = (data: {
-    fullName: string;
-    phoneNumber: string;
-    email: string;
-    isPaid: boolean;
-    telebirrTxId?: string;
-    paymentScreenshot?: string;
-  }): UserProfile => {
-    const newUser: UserProfile = {
-      id: `user-${Date.now()}`,
-      fullName: data.fullName,
-      phoneNumber: data.phoneNumber,
-      email: data.email,
-      role: 'user',
-      subscriptionStatus: data.isPaid ? 'pending_approval' : 'free_trial',
-      registeredAt: new Date().toISOString(),
-      expiresAt: null,
-      telebirrTxId: data.telebirrTxId,
-      paymentScreenshot: data.paymentScreenshot,
-      paymentAmount: data.isPaid ? 3900 : 0,
-      notes: data.isPaid ? 'Registered with Telebirr 3,900 ETB proof' : 'Registered on Free Trial',
-      completedChapters: []
-    };
-
-    setUsers(prev => [newUser, ...prev]);
-    setCurrentUserId(newUser.id);
-    return newUser;
-  };
-
-  const submitPayment = (telebirrTxId: string, paymentScreenshot?: string) => {
-    setUsers(prev =>
-      prev.map(u => {
-        if (u.id === currentUserId) {
-          return {
-            ...u,
-            subscriptionStatus: 'pending_approval',
-            telebirrTxId,
-            paymentScreenshot: paymentScreenshot || u.paymentScreenshot,
-            paymentAmount: 3900,
-            notes: `Submitted payment 3,900 ETB to 0967684490 (Abdulkerim) at ${new Date().toLocaleDateString()}`
-          };
-        }
-        return u;
-      })
-    );
-  };
-
   const adminApproveUser = (userId: string, days: number = 30) => {
     if (!isAdmin || !Number.isInteger(days) || days < 1) return;
     const now = new Date();
@@ -427,8 +329,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         users,
         theme,
         toggleTheme,
-        registerUser,
-        submitPayment,
         adminApproveUser,
         adminRejectUser,
         adminExtendUser,

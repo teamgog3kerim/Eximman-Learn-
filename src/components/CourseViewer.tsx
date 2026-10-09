@@ -249,16 +249,16 @@ export const CourseViewer: React.FC = () => {
               <span>Full Academy Access</span>
             </div>
             <h3 className="text-base font-serif-title font-bold text-white">
-              Unlock All 16 Chapters & Cost Breakdown Tools
+              Additional course chapters
             </h3>
             <p className="text-xs text-neutral-300 leading-relaxed">
-              Pay <strong>3,900 Birr</strong> via Telebirr to <strong>0967684490 (Abdulkerim)</strong> for 30 days of full access, interactive case studies, and calculators.
+              Full course access is not available in this local demo. Payment and registration features have not been connected; do not send money based on this screen.
             </p>
             <button
               onClick={() => setShowPaywallModal(true)}
               className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
-              Subscribe Now (3,900 ETB)
+                View demo pricing information
             </button>
           </div>
         )}
@@ -399,23 +399,23 @@ export const CourseViewer: React.FC = () => {
             </div>
             <div>
               <span className="text-xs uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400">
-                Free Trial Limitation
+                 Demo preview limitation
               </span>
               <h2 className="text-2xl font-serif-title font-bold text-neutral-900 dark:text-neutral-100 mt-1">
-                Chapter {currentChapter.chapterNumber} is Reserved for Subscribed Members
+                Chapter {currentChapter.chapterNumber} is not available in this preview
               </h2>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-lg mx-auto mt-2">
-                Free trial gives you full access to Module 1 (Chapters 1 & 2). To continue your masterclass in Letters of Credit, Djibouti corridor transit, Ethiopian customs tax stacks, and cost build-up sheets, activate your 30-day membership.
+                This demo preview includes the free chapters. No checkout, subscription, or secure account service is connected here.
               </p>
             </div>
 
             <div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-xl max-w-md mx-auto text-left text-xs space-y-2 border border-neutral-200 dark:border-neutral-700">
               <div className="font-semibold text-neutral-800 dark:text-neutral-200">
-                What you unlock with 3,900 ETB:
+                Additional content in the imported project:
               </div>
               <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Chapters 3 through 16 with full Ethiopian regulatory guides</span>
+                <span>Chapters 3 through 16</span>
               </div>
               <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -435,7 +435,7 @@ export const CourseViewer: React.FC = () => {
               onClick={() => setShowPaywallModal(true)}
               className="px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl transition-colors shadow-sm"
             >
-              Subscribe via Telebirr (3,900 ETB to 0967684490)
+              View demo pricing information
             </button>
           </div>
         ) : (

@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { COURSE_MODULES } from '../data/courseData';
 import { useApp } from '../context/AppContext';
 import { HelpCircle, CheckCircle2, Lock, ArrowRight, RotateCcw, Award } from 'lucide-react';
 
 export const QuizCenter: React.FC = () => {
-  const { hasFullAccess, setShowPaywallModal, setSelectedChapterId, setActiveNavTab } = useApp();
+  const {
+    currentUser, hasFullAccess, setShowPaywallModal, setSelectedChapterId,
+    setActiveNavTab, recordQuizScore, quizScores
+  } = useApp();
 
   const [selectedModuleId, setSelectedModuleId] = useState<string>('all');
   const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
   const [checkedQuestions, setCheckedQuestions] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setUserAnswers({});
+    setCheckedQuestions({});
+  }, [currentUser.id]);
 
   // Gather all quizzes
   const allQuizzes = COURSE_MODULES.flatMap(mod =>
@@ -25,11 +33,32 @@ export const QuizCenter: React.FC = () => {
   });
 
   const handleSelectOption = (questionId: string, optionIndex: number) => {
+    if (checkedQuestions[questionId]) return;
     setUserAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
   };
 
-  const handleCheckQuestion = (questionId: string) => {
-    setCheckedQuestions(prev => ({ ...prev, [questionId]: true }));
+  const handleCheckQuestion = (questionId: string, chapterId: string, questionIds: string[]) => {
+    if (userAnswers[questionId] === undefined) return;
+    const nextChecked = { ...checkedQuestions, [questionId]: true };
+    setCheckedQuestions(nextChecked);
+    if (questionIds.every(id => nextChecked[id])) {
+      const chapter = allQuizzes.find(item => item.chapter.id === chapterId)?.chapter;
+      if (chapter) {
+        const correctCount = chapter.quiz.filter(question =>
+          userAnswers[question.id] === question.correctIndex
+        ).length;
+        recordQuizScore(chapterId, correctCount, questionIds.length);
+      }
+    }
+  };
+
+  const handleRetake = (questionIds: string[]) => {
+    setUserAnswers(previous => Object.fromEntries(
+      Object.entries(previous).filter(([id]) => !questionIds.includes(id))
+    ));
+    setCheckedQuestions(previous => Object.fromEntries(
+      Object.entries(previous).filter(([id]) => !questionIds.includes(id))
+    ));
   };
 
   return (
@@ -122,7 +151,7 @@ export const QuizCenter: React.FC = () => {
                   onClick={() => setShowPaywallModal(true)}
                   className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold"
                 >
-                  Unlock All Quizzes
+                  View demo pricing information
                 </button>
               </div>
             ) : (
@@ -161,6 +190,9 @@ export const QuizCenter: React.FC = () => {
                           return (
                             <button
                               key={optIdx}
+                              type="button"
+                              disabled={isChecked}
+                              aria-pressed={selectedOpt === optIdx}
                               onClick={() => handleSelectOption(q.id, optIdx)}
                               className={`w-full p-2.5 rounded-lg border text-left transition-colors flex items-center justify-between ${optStyle}`}
                             >
@@ -176,7 +208,7 @@ export const QuizCenter: React.FC = () => {
                       <div className="flex items-center justify-between pt-2">
                         {!isChecked ? (
                           <button
-                            onClick={() => handleCheckQuestion(q.id)}
+                            onClick={() => handleCheckQuestion(q.id, chapter.id, chapter.quiz.map(question => question.id))}
                             disabled={selectedOpt === undefined}
                             className="px-3 py-1.5 bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 text-white rounded-lg text-[11px] font-bold disabled:opacity-40"
                           >
@@ -202,6 +234,15 @@ export const QuizCenter: React.FC = () => {
                     </div>
                   );
                 })}
+                {chapter.quiz.length > 0 && chapter.quiz.every(question => checkedQuestions[question.id]) && quizScores[chapter.id] && (
+                  <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
+                    Attempt saved for this demo learner: <strong>{quizScores[chapter.id].score}/{quizScores[chapter.id].maxScore}</strong>.
+                    {quizScores[chapter.id].score / quizScores[chapter.id].maxScore >= 0.6
+                      ? ' The lesson is marked complete.'
+                      : ' Review the lesson, then try again.'}
+                    <button type="button" onClick={() => handleRetake(chapter.quiz.map(question => question.id))} className="ml-3 font-bold underline">Retake this quiz</button>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { COURSE_MODULES } from '../data/courseData';
 import {
   Award,
   CheckCircle2,
@@ -33,30 +34,30 @@ export const CertificationView: React.FC = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  useEffect(() => setStudentName(currentUser.fullName), [currentUser.id, currentUser.fullName]);
 
-  const isCompleted = completedChaptersCount === 16 || currentUser.role === 'admin' || currentUser.completedChapters?.length === 16;
-  const certificateId = currentUser.certificateId || `ET-IMPEX-2026-${currentUser.id.slice(-4).toUpperCase() || '8841'}`;
+  const isCompleted = completedChaptersCount === COURSE_MODULES.flatMap(module => module.chapters).length;
+  const certificateId = currentUser.certificateId || 'Not issued';
   const issueDate = currentUser.certificateIssuedAt
     ? new Date(currentUser.certificateIssuedAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       })
-    : new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+    : 'Not issued';
 
   const handlePrint = () => {
     window.print();
   };
 
-  const handleCopyVerification = () => {
-    const text = `https://ethio-impex.academy/verify/${certificateId}`;
-    navigator.clipboard.writeText(text);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
+  const handleCopyVerification = async () => {
+    try {
+      await navigator.clipboard.writeText(certificateId);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    } catch {
+      setCopiedLink(false);
+    }
   };
 
   return (
@@ -67,40 +68,43 @@ export const CertificationView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1">
               <Award className="w-4 h-4" />
-              <span>Official Executive Accreditation & Diploma</span>
+              <span>Demo course-completion record</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50">
               Executive Certification in Ethiopian Foreign Trade
             </h1>
             <p className="text-xs text-neutral-500 mt-1">
-              Issued by the Ethiopia Import, Export & Logistics Academy upon mastery of the 16-chapter curriculum.
+              Local progress record for this browser only. This is not an accredited qualification or independently verifiable credential.
             </p>
           </div>
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setShowVerifyModal(true)}
+              onClick={handleCopyVerification}
+              disabled={!currentUser.certificateIssuedAt}
               className="py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Verify Registry</span>
+              <span>{currentUser.certificateIssuedAt ? 'Copy certificate ID' : 'No certificate issued'}</span>
             </button>
 
             <button
               onClick={handleCopyVerification}
+              disabled={!currentUser.certificateIssuedAt}
               className="py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
-              <span>{copiedLink ? 'Link Copied!' : 'Share Credential'}</span>
+              <span>{copiedLink ? 'ID copied' : 'Copy certificate ID'}</span>
             </button>
 
             <button
               onClick={handlePrint}
+              disabled={!currentUser.certificateIssuedAt}
               className="py-2.5 px-5 text-xs font-bold rounded-xl bg-amber-700 hover:bg-amber-800 text-white transition-colors flex items-center gap-1.5 shadow-xs"
             >
               <Printer className="w-4 h-4" />
-              <span>Print / Save PDF Diploma</span>
+                <span>Print course record</span>
             </button>
           </div>
         </div>
@@ -111,23 +115,14 @@ export const CertificationView: React.FC = () => {
             <div className="space-y-1">
               <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>Certification Progress: {completedChaptersCount} of 16 Chapters Finished</span>
+                <span>Course progress: {completedChaptersCount} of {COURSE_MODULES.flatMap(module => module.chapters).length} lessons completed</span>
               </div>
               <p className="text-amber-800/90 dark:text-amber-300/80">
-                You are currently viewing a live diploma preview. Complete all 16 chapters or mark them in the Records Tracker to finalize your credential!
+                This print preview is for demonstration only. Complete all course lessons to enable a locally generated progress record.
               </p>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => {
-                  issueCertificate();
-                }}
-                className="py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors text-[11px]"
-              >
-                Claim / Issue Certificate
-              </button>
-
               <button
                 onClick={() => setActiveNavTab('progress')}
                 className="py-2 px-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 font-semibold rounded-lg text-[11px]"
@@ -136,12 +131,17 @@ export const CertificationView: React.FC = () => {
               </button>
             </div>
           </div>
-        ) : (
+        ) : currentUser.certificateIssuedAt ? (
           <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-900 dark:text-emerald-200">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
-              <span className="font-bold">Credential Officially Validated:</span> All 16 chapters completed. Certificate is active in the registry under ID <span className="font-mono font-bold">{certificateId}</span>.
+              <span className="font-bold">Course complete.</span> A local progress record has been issued for this browser. It is not an accredited certificate and has no online verification.
             </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 sm:flex-row sm:items-center sm:justify-between">
+            <p><strong>All lessons completed.</strong> You can generate a local course-completion record. It is not an accredited credential.</p>
+            <button type="button" onClick={issueCertificate} className="shrink-0 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white hover:bg-emerald-900 dark:bg-emerald-200 dark:text-emerald-950">Generate course record</button>
           </div>
         )}
 
@@ -199,7 +199,7 @@ export const CertificationView: React.FC = () => {
             </div>
 
             <div className="text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-400 mt-2">
-              Federal Democratic Republic of Ethiopia
+              DEMONSTRATION · BROWSER-STORED RECORD
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl font-serif-title font-bold tracking-wider text-amber-900 dark:text-amber-400 uppercase">
@@ -227,7 +227,7 @@ export const CertificationView: React.FC = () => {
 
             <div className="bg-amber-100/70 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 rounded-xl p-4 my-3">
               <h3 className="text-lg sm:text-xl md:text-2xl font-serif-title font-bold text-amber-950 dark:text-amber-200">
-                Executive Diploma in Ethiopian Foreign Trade, Single Window (ESW) Operations, Trade Finance & Customs Valuation
+              Course Completion · Ethiopian Import, Export & Logistics
               </h3>
             </div>
           </div>
@@ -235,7 +235,7 @@ export const CertificationView: React.FC = () => {
           {/* Competency Syllabus Summary */}
           <div className="max-w-3xl mx-auto pt-2">
             <div className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 text-center mb-2">
-              Verified Curriculum Competencies (16 Core Chapters):
+              Topics covered in the curriculum:
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-neutral-600 dark:text-neutral-400 font-sans">
               <div className="flex items-center gap-1.5">
@@ -265,46 +265,35 @@ export const CertificationView: React.FC = () => {
             </div>
           </div>
 
-          {/* Signatures & Official Gold Seal */}
+          {/* Local demonstration record; not an accredited credential. */}
           <div className="pt-8 border-t border-amber-800/30 dark:border-amber-700/30 flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Signature 1: Abdulkerim */}
             <div className="text-center md:text-left space-y-1">
-              <div className="font-serif-title italic text-xl text-neutral-800 dark:text-neutral-200">
-                Abdulkerim
-              </div>
-              <div className="w-48 h-0.5 bg-neutral-400 dark:bg-neutral-600 mx-auto md:mx-0" />
               <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                Abdulkerim
+                Learner progress
               </div>
               <div className="text-[10px] text-neutral-500 uppercase tracking-wider">
-                Program Director & Lead Trade Specialist (Telebirr 0967684490)
+                Stored in this browser only
               </div>
             </div>
 
-            {/* Center: Gold Foil Stamp Emblem */}
             <div className="relative shrink-0 flex flex-col items-center">
               <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-amber-700 p-1 shadow-lg flex items-center justify-center text-center">
                 <div className="w-full h-full rounded-full border-2 border-dashed border-amber-950 flex flex-col items-center justify-center bg-amber-500 text-amber-950 p-1">
                   <ShieldCheck className="w-6 h-6" />
                   <span className="text-[8px] font-bold uppercase tracking-tighter leading-tight mt-0.5">
-                    OFFICIAL SEAL
+                    LOCAL DEMO
                   </span>
-                  <span className="text-[7px] font-mono leading-none">ACCREDITED</span>
+                  <span className="text-[7px] font-mono leading-none">UNVERIFIED</span>
                 </div>
               </div>
             </div>
 
-            {/* Signature 2: Academic Registrar */}
             <div className="text-center md:text-right space-y-1">
-              <div className="font-serif-title italic text-xl text-neutral-800 dark:text-neutral-200">
-                Ethio-ImpEx Board
-              </div>
-              <div className="w-48 h-0.5 bg-neutral-400 dark:bg-neutral-600 mx-auto md:ml-auto md:mr-0" />
               <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                Director of Academic Affairs
+                Progress record
               </div>
               <div className="text-[10px] text-neutral-500 uppercase tracking-wider">
-                Ethio-ImpEx Academy Examination Council
+                Not externally verified
               </div>
             </div>
           </div>
@@ -318,13 +307,13 @@ export const CertificationView: React.FC = () => {
               DATE CONFERRED: <span className="font-bold text-neutral-700 dark:text-neutral-300">{issueDate}</span>
             </div>
             <div>
-              REGISTRATION STATUS: <span className="text-emerald-600 dark:text-emerald-400 font-bold">VERIFIED & ACCREDITED</span>
+              REGISTRATION STATUS: <span className="font-bold">LOCAL DEMO · NOT ACCREDITED</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Online Verification Modal */}
+      {/* No online registry exists for certificates in this local demo. */}
       {showVerifyModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-scale-up">
@@ -332,7 +321,7 @@ export const CertificationView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm text-neutral-900 dark:text-neutral-100">
-                  Credential Verification Database
+                  Local certificate information
                 </h3>
               </div>
               <button
@@ -345,10 +334,8 @@ export const CertificationView: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-300">
-                <div className="font-bold">✓ Official Credential Found & Validated</div>
-                <div className="text-[11px] mt-0.5">
-                  Record matches Ethiopia Import Export Academy Central Academic Registry.
-                </div>
+                <div className="font-bold">Online certificate verification is not available</div>
+                <div className="text-[11px] mt-0.5">This demo stores its course records only in the current browser. No central registry or accreditation is connected.</div>
               </div>
 
               <div className="border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 space-y-2">
@@ -366,11 +353,11 @@ export const CertificationView: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Curriculum Scope:</span>
-                  <span>16 Chapters (30 CPD Hours)</span>
+                  <span>{COURSE_MODULES.length} course modules</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-400">Program Director:</span>
-                  <span>Abdulkerim (0967684490)</span>
+                  <span className="text-neutral-400">Record storage:</span>
+                  <span>This browser only</span>
                 </div>
               </div>
             </div>

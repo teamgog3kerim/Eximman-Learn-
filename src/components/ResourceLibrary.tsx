@@ -58,7 +58,6 @@ export const ResourceLibrary: React.FC = () => {
   };
 
   const handleDownload = (doc: ResourceDocument) => {
-    // Generate text blob for download
     const content = `=====================================================
 ${doc.title}
 Authority: ${doc.authority}
@@ -71,26 +70,27 @@ ${doc.description}
 KEY REGULATORY HIGHLIGHTS:
 ${doc.keyHighlights.map((h, i) => `${i + 1}. ${h}`).join('\n')}
 
-DOCUMENT EXCERPT & OPERATIONAL TEXT:
+SAMPLE EXCERPT (NOT THE OFFICIAL SOURCE DOCUMENT):
 -----------------------------------------------------
 ${doc.samplePreviewText}
 -----------------------------------------------------
 
-Provided by: Ethiopia Import, Export & Logistics Academy
-Program Director: Abdulkerim (Telebirr 0967684490)
+This text-only learning summary was generated from sample content in the local demo.
+It is not an official source document and is not a substitute for checking current
+rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
 `;
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.${doc.format === 'XLSX' ? 'xlsx.txt' : doc.format.toLowerCase()}`;
+    link.download = `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}_sample_summary.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    setDownloadSuccess(`Downloaded "${doc.title}" successfully.`);
+    setDownloadSuccess(`Downloaded the sample text summary for "${doc.title}". It is not the official ${doc.format} document.`);
     setTimeout(() => setDownloadSuccess(null), 3500);
   };
 
@@ -139,7 +139,7 @@ Program Director: Abdulkerim (Telebirr 0967684490)
             Ethiopian Trade & Logistics Resource Library
           </h1>
           <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            Direct access to official National Bank of Ethiopia (NBE) foreign exchange directives, Customs Proclamation schedules, single window filing protocols, Excel cost calculation templates, and contract appeals.
+            Browse sample descriptions and excerpts saved with this demo. It does not include the official source documents, verified download files, or live regulatory updates. Check current rules with the issuing authorities.
           </p>
         </div>
       </div>
@@ -348,7 +348,7 @@ Program Director: Abdulkerim (Telebirr 0967684490)
                     className="flex-1 py-2 px-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-black dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white text-white transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download</span>
+                    <span>Download sample summary</span>
                   </button>
                 </div>
               </div>
@@ -461,7 +461,7 @@ Program Director: Abdulkerim (Telebirr 0967684490)
                 className="px-5 py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download Full Document ({previewDoc.format})</span>
+                <span>Download sample text summary</span>
               </button>
             </div>
           </div>

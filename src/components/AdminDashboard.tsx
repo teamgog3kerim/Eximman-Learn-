@@ -7,7 +7,6 @@ import {
   Clock,
   XCircle,
   Eye,
-  Plus,
   Search,
   Filter,
   DollarSign,
@@ -26,20 +25,12 @@ export const AdminDashboard: React.FC = () => {
     adminRejectUser,
     adminExtendUser,
     switchUser,
-    registerUser,
     currentUser
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedProofUser, setSelectedProofUser] = useState<UserProfile | null>(null);
-
-  // Manual User Creation Modal
-  const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [newFullName, setNewFullName] = useState<string>('');
-  const [newPhone, setNewPhone] = useState<string>('');
-  const [newEmail, setNewEmail] = useState<string>('');
-  const [newPlan, setNewPlan] = useState<'paid' | 'free'>('paid');
 
   // Metrics
   const totalUsers = users.filter(u => u.role !== 'admin').length;
@@ -64,26 +55,6 @@ export const AdminDashboard: React.FC = () => {
       );
     });
 
-  const handleManualAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newUser = registerUser({
-      fullName: newFullName,
-      phoneNumber: newPhone,
-      email: newEmail,
-      isPaid: newPlan === 'paid',
-      telebirrTxId: newPlan === 'paid' ? `TB-${Date.now().toString().slice(-8)}` : undefined
-    });
-
-    if (newPlan === 'paid') {
-      adminApproveUser(newUser.id, 30);
-    }
-
-    setNewFullName('');
-    setNewPhone('');
-    setNewEmail('');
-    setShowAddModal(false);
-  };
-
   const formatETB = (val: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
@@ -106,23 +77,16 @@ export const AdminDashboard: React.FC = () => {
             <ShieldCheck className="w-4 h-4" />
             <span>Administrator Control Dashboard</span>
             <span>·</span>
-            <span>Abdulkerim (0967684490)</span>
+            <span>Demo administrator</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 mt-1">
             Subscription Approvals & Student Management
           </h1>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-            Review student registrations, verify Telebirr 3,900 ETB payments to 0967684490, grant 30-day access, or extend subscriptions.
+            Local demonstration only. Account approvals and access changes affect this browser only; no payment is verified and this is not a secure admin system.
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold shadow-sm transition-colors self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Register New Student</span>
-        </button>
       </div>
 
       {/* KPI Cards */}
@@ -300,7 +264,7 @@ export const AdminDashboard: React.FC = () => {
                               </button>
                             ) : (
                               <span className="text-[10px] text-neutral-400 font-sans">
-                                Transfer to 0967684490
+                                Payment verification is not connected
                               </span>
                             )}
                           </div>
@@ -442,98 +406,6 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Manual Add Student Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
-              <h3 className="font-serif-title font-bold text-lg text-neutral-900 dark:text-neutral-100">
-                Manual Student Enrollment
-              </h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleManualAdd} className="space-y-3 text-xs">
-              <div>
-                <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newFullName}
-                  onChange={e => setNewFullName(e.target.value)}
-                  placeholder="e.g. Almaz Tadesse"
-                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border rounded-xl"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Mobile Number
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={newPhone}
-                  onChange={e => setNewPhone(e.target.value)}
-                  placeholder="0911000000"
-                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border rounded-xl font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Gmail Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={newEmail}
-                  onChange={e => setNewEmail(e.target.value)}
-                  placeholder="almaz@gmail.com"
-                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border rounded-xl"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Initial Plan
-                </label>
-                <select
-                  value={newPlan}
-                  onChange={e => setNewPlan(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border rounded-xl"
-                >
-                  <option value="paid">Paid 30 Days (Instant Approval)</option>
-                  <option value="free">Free Trial (Module 1 Only)</option>
-                </select>
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-3 py-2 text-neutral-600 hover:bg-neutral-100 rounded-xl"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl"
-                >
-                  Create Student
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
