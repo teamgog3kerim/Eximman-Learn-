@@ -236,7 +236,7 @@ export const QuizCenter: React.FC = () => {
                 })}
                 {chapter.quiz.length > 0 && chapter.quiz.every(question => checkedQuestions[question.id]) && quizScores[chapter.id] && (
                   <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                    Attempt saved for this demo learner: <strong>{quizScores[chapter.id].score}/{quizScores[chapter.id].maxScore}</strong>.
+                    Attempt saved to your account: <strong>{quizScores[chapter.id].score}/{quizScores[chapter.id].maxScore}</strong>.
                     {quizScores[chapter.id].score / quizScores[chapter.id].maxScore >= 0.6
                       ? ' The lesson is marked complete.'
                       : ' Review the lesson, then try again.'}

@@ -41,6 +41,7 @@ interface AppContextType {
   issueCertificate: () => void;
   quizScores: Record<string, { score: number; maxScore: number; date: string }>;
   recordQuizScore: (chapterId: string, score: number, maxScore: number) => void;
+  progressSaveError: string;
 }
 
 const STORAGE_KEY_USERS = 'ethio_impex_users_v3';
@@ -49,8 +50,20 @@ const STORAGE_KEY_THEME = 'ethio_impex_theme';
 const STORAGE_KEY_QUIZ_SCORES = 'ethio_impex_quiz_scores_v3';
 const STORAGE_KEY_USER_QUIZZES = 'ethio_impex_user_quizzes_v1';
 type QuizScores = Record<string, { score: number; maxScore: number; date: string }>;
+type LearnerProgress = {
+  completedChapters: string[];
+  quizScores: QuizScores;
+  certificateId: string | null;
+  certificateIssuedAt: string | null;
+};
 const ALL_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
 const CHAPTER_IDS = new Set(ALL_CHAPTERS.map(chapter => chapter.id));
+const EMPTY_PROGRESS: LearnerProgress = {
+  completedChapters: [],
+  quizScores: {},
+  certificateId: null,
+  certificateIssuedAt: null,
+};
 const saveLocal = (key: string, value: string) => {
   try {
     localStorage.setItem(key, value);
@@ -58,6 +71,39 @@ const saveLocal = (key: string, value: string) => {
     window.dispatchEvent(new Event('academy-storage-error'));
   }
 };
+
+function readLegacyProgress(userId: string): LearnerProgress | null {
+  try {
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEY_USERS) || '[]');
+    const localUser = Array.isArray(users) ? users.find(user => user?.id === userId) : undefined;
+    const scopedQuizzes = JSON.parse(localStorage.getItem(STORAGE_KEY_USER_QUIZZES) || '{}');
+    const quizScores = scopedQuizzes?.[userId];
+    const completedChapters = Array.isArray(localUser?.completedChapters)
+      ? localUser.completedChapters.filter((id: unknown): id is string => typeof id === 'string' && CHAPTER_IDS.has(id))
+      : [];
+    const validQuizScores = quizScores && typeof quizScores === 'object' && !Array.isArray(quizScores)
+      ? quizScores
+      : {};
+    const allComplete = Array.isArray(localUser?.completedChapters) &&
+      ALL_CHAPTERS.every(chapter => localUser.completedChapters.includes(chapter.id));
+    const certificateId = allComplete && typeof localUser?.certificateId === 'string'
+      ? localUser.certificateId
+      : null;
+    const certificateIssuedAt = certificateId && typeof localUser?.certificateIssuedAt === 'string'
+      ? localUser.certificateIssuedAt
+      : null;
+    if (!completedChapters.length && !Object.keys(validQuizScores).length && !certificateIssuedAt) return null;
+    return {
+      completedChapters,
+      quizScores: validQuizScores,
+      certificateId: certificateIssuedAt ? certificateId : null,
+      certificateIssuedAt,
+    };
+  } catch {
+    // Old browser data is optional; it must never prevent account progress from loading.
+    return EMPTY_PROGRESS;
+  }
+}
 
 const SEED_USERS: UserProfile[] = [
   {
@@ -107,6 +153,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
   });
 
   const [currentUserId, setCurrentUserId] = useState<string>(profile.id);
+  const [progress, setProgress] = useState<LearnerProgress | null>(null);
+  const [progressOwnerId, setProgressOwnerId] = useState<string | null>(null);
+  const [progressLoading, setProgressLoading] = useState(true);
+  const [progressLoadError, setProgressLoadError] = useState('');
+  const [progressSaveError, setProgressSaveError] = useState('');
+  const [progressRetry, setProgressRetry] = useState(0);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
@@ -150,6 +202,64 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
   }, [userQuizScores]);
 
   useEffect(() => {
+    let active = true;
+    setProgress(null);
+    setProgressLoading(true);
+    setProgressLoadError('');
+
+    const loadProgress = async () => {
+      try {
+        const response = await fetch('/api/progress', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Could not load your saved learning progress.');
+        const result = await response.json();
+        let loaded: LearnerProgress | null = result.progress;
+        if (!loaded) {
+          const legacyProgress = readLegacyProgress(profile.id);
+          if (legacyProgress) {
+            const importResponse = await fetch('/api/progress', {
+              method: 'PUT',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(legacyProgress),
+            });
+            if (!importResponse.ok) throw new Error('Could not save this device’s learning progress to your account.');
+            loaded = (await importResponse.json()).progress;
+          }
+        }
+        if (active) {
+          setProgress(loaded);
+          setProgressOwnerId(profile.id);
+          if (loaded) setUserQuizScores(previous => ({ ...previous, [profile.id]: loaded.quizScores }));
+        }
+      } catch (error) {
+        if (active) setProgressLoadError(error instanceof Error ? error.message : 'Could not load your saved learning progress.');
+      } finally {
+        if (active) setProgressLoading(false);
+      }
+    };
+
+    void loadProgress();
+    return () => { active = false; };
+  }, [profile.id, progressRetry]);
+
+  useEffect(() => {
+    if (!progress) return;
+    setUsers(previous => {
+      const existing = previous.find(user => user.id === profile.id);
+      const updated = {
+        ...(existing || profile),
+        ...profile,
+        completedChapters: progress.completedChapters,
+        certificateId: progress.certificateId || undefined,
+        certificateIssuedAt: progress.certificateIssuedAt || undefined,
+      };
+      return existing
+        ? previous.map(user => user.id === profile.id ? updated : user)
+        : [updated, ...previous];
+    });
+  }, [progress, profile.id]);
+
+  useEffect(() => {
     saveLocal(STORAGE_KEY_THEME, theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -170,8 +280,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
       return saved ? previous.map(user => user.id === profile.id ? next : user) : [next, ...previous];
     });
   }, [profile.id, profile.email, profile.fullName, profile.role, profile.subscriptionStatus, profile.expiresAt]);
-  const currentUser = { ...(users.find(u => u.id === profile.id) || SEED_USERS[1]), ...profile };
-  const quizScores = userQuizScores[currentUser.id] || {};
+  const currentUser = {
+    ...(users.find(u => u.id === profile.id) || profile),
+    ...profile,
+    completedChapters: progress?.completedChapters || [],
+    certificateId: progress?.certificateId || undefined,
+    certificateIssuedAt: progress?.certificateIssuedAt || undefined,
+  };
+  const quizScores = progress?.quizScores || {};
   const isAdmin = currentUser.role === 'admin';
 
   const isSubscriptionValid = () => {
@@ -184,7 +300,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
   const hasFullAccess = isAdmin || isSubscriptionValid();
 
   // Progress logic
-  const completedChapters = [...new Set(currentUser.completedChapters || [])].filter(id => CHAPTER_IDS.has(id));
+  const completedChapters = [...new Set(progress?.completedChapters || [])].filter(id => CHAPTER_IDS.has(id));
   const completedChaptersCount = completedChapters.length;
   const progressPercentage = Math.round((completedChaptersCount / ALL_CHAPTERS.length) * 100);
 
@@ -192,67 +308,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
     return completedChapters.includes(chapterId);
   };
 
-  const toggleChapterComplete = (chapterId: string) => {
-    const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
-    if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible)) return;
-    setUsers(prev =>
-      prev.map(u => {
-        if (u.id === currentUser.id) {
-          const currentList = u.completedChapters || [];
-          const exists = currentList.includes(chapterId);
-          const updated = exists
-            ? currentList.filter(id => id !== chapterId)
-            : [...currentList, chapterId];
-
-          return {
-            ...u,
-            completedChapters: updated
-          };
-        }
-        return u;
-      })
-    );
+  const saveProgressAction = async (action: Record<string, unknown>) => {
+    setProgressSaveError('');
+    try {
+      if (!progress) {
+        const initializeResponse = await fetch('/api/progress', {
+          method: 'PUT',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(EMPTY_PROGRESS),
+        });
+        if (!initializeResponse.ok) throw new Error('Your saved progress could not be initialized.');
+        setProgress((await initializeResponse.json()).progress);
+      }
+      const response = await fetch('/api/progress', {
+        method: 'PATCH',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Your progress could not be saved.');
+      setProgress(result.progress);
+      setUserQuizScores(previous => ({ ...previous, [profile.id]: result.progress.quizScores }));
+    } catch (error) {
+      setProgressSaveError(error instanceof Error ? error.message : 'Your progress could not be saved.');
+    }
   };
 
-  const recordQuizScore = (chapterId: string, score: number, maxScore: number) => {
+  const toggleChapterComplete = async (chapterId: string) => {
+    const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
+    if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible)) return;
+    await saveProgressAction({
+      action: 'chapter',
+      chapterId,
+      completed: !completedChapters.includes(chapterId),
+    });
+  };
+
+  const recordQuizScore = async (chapterId: string, score: number, maxScore: number) => {
     const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
     if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible) ||
       !Number.isInteger(score) || maxScore !== chapter.quiz.length || maxScore < 1 ||
       score < 0 || score > maxScore) return;
-    const today = new Date().toISOString().split('T')[0];
-    setUserQuizScores(prev => ({
-      ...prev,
-      [currentUser.id]: {
-        ...prev[currentUser.id],
-        [chapterId]: { score, maxScore, date: today }
-      }
-    }));
-
-    // Auto-mark chapter as complete if passed with 60%+ score
-    if (score / maxScore >= 0.6) {
-      if (!isChapterCompleted(chapterId)) {
-        toggleChapterComplete(chapterId);
-      }
-    }
+    await saveProgressAction({ action: 'quiz', chapterId, score });
   };
 
-  const issueCertificate = () => {
+  const issueCertificate = async () => {
     if (completedChaptersCount !== ALL_CHAPTERS.length) return;
-    const certCode = `ET-IMPEX-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
-    const now = new Date().toISOString();
-
-    setUsers(prev =>
-      prev.map(u => {
-        if (u.id === currentUserId) {
-          return {
-            ...u,
-            certificateId: u.certificateId || certCode,
-            certificateIssuedAt: u.certificateIssuedAt || now
-          };
-        }
-        return u;
-      })
-    );
+    await saveProgressAction({ action: 'certificate' });
   };
 
   const adminApproveUser = (userId: string, days: number = 30) => {
@@ -322,6 +426,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
     setActiveNavTab('admin');
   };
 
+  if (progressLoading || (!progressLoadError && progressOwnerId !== profile.id)) {
+    return <div className="flex min-h-screen items-center justify-center text-sm academy-muted">Loading your saved learning progress…</div>;
+  }
+  if (progressLoadError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center text-sm academy-muted">
+        <p role="alert">{progressLoadError}</p>
+        <button type="button" onClick={() => setProgressRetry(value => value + 1)} className="rounded-xl bg-[#176b60] px-5 py-3 font-bold text-white">
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -348,7 +466,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
         progressPercentage,
         issueCertificate,
         quizScores,
-        recordQuizScore
+        recordQuizScore,
+        progressSaveError,
       }}
     >
       {children}

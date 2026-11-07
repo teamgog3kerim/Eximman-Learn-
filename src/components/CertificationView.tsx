@@ -74,7 +74,7 @@ export const CertificationView: React.FC = () => {
               Executive Certification in Ethiopian Foreign Trade
             </h1>
             <p className="text-xs text-neutral-500 mt-1">
-              Local progress record for this browser only. This is not an accredited qualification or independently verifiable credential.
+              Progress is saved to your account. This is not an accredited qualification or independently verifiable credential.
             </p>
           </div>
 
@@ -118,7 +118,7 @@ export const CertificationView: React.FC = () => {
                 <span>Course progress: {completedChaptersCount} of {COURSE_MODULES.flatMap(module => module.chapters).length} lessons completed</span>
               </div>
               <p className="text-amber-800/90 dark:text-amber-300/80">
-                This print preview is for demonstration only. Complete all course lessons to enable a locally generated progress record.
+                This print preview is for demonstration only. Complete all course lessons to enable an account-saved course record.
               </p>
             </div>
 
@@ -135,12 +135,12 @@ export const CertificationView: React.FC = () => {
           <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-900 dark:text-emerald-200">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
-              <span className="font-bold">Course complete.</span> A local progress record has been issued for this browser. It is not an accredited certificate and has no online verification.
+              <span className="font-bold">Course complete.</span> Your progress record is saved to your account. It is not an accredited certificate and has no online verification.
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 sm:flex-row sm:items-center sm:justify-between">
-            <p><strong>All lessons completed.</strong> You can generate a local course-completion record. It is not an accredited credential.</p>
+            <p><strong>All lessons completed.</strong> You can generate an account-saved course-completion record. It is not an accredited credential.</p>
             <button type="button" onClick={issueCertificate} className="shrink-0 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white hover:bg-emerald-900 dark:bg-emerald-200 dark:text-emerald-950">Generate course record</button>
           </div>
         )}
@@ -265,14 +265,14 @@ export const CertificationView: React.FC = () => {
             </div>
           </div>
 
-          {/* Local demonstration record; not an accredited credential. */}
+          {/* Account-saved demonstration record; not an accredited credential. */}
           <div className="pt-8 border-t border-amber-800/30 dark:border-amber-700/30 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left space-y-1">
               <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
                 Learner progress
               </div>
               <div className="text-[10px] text-neutral-500 uppercase tracking-wider">
-                Stored in this browser only
+                Saved to your account
               </div>
             </div>
 
@@ -313,7 +313,7 @@ export const CertificationView: React.FC = () => {
         </div>
       </div>
 
-      {/* No online registry exists for certificates in this local demo. */}
+      {/* The account record is persistent, but there is no external certificate registry. */}
       {showVerifyModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-scale-up">
@@ -321,7 +321,7 @@ export const CertificationView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm text-neutral-900 dark:text-neutral-100">
-                  Local certificate information
+                  Course record information
                 </h3>
               </div>
               <button
@@ -335,7 +335,7 @@ export const CertificationView: React.FC = () => {
             <div className="space-y-3 text-xs">
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-300">
                 <div className="font-bold">Online certificate verification is not available</div>
-                <div className="text-[11px] mt-0.5">This demo stores its course records only in the current browser. No central registry or accreditation is connected.</div>
+                <div className="text-[11px] mt-0.5">Your course record is saved to your account. No central verification registry or accreditation is connected.</div>
               </div>
 
               <div className="border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 space-y-2">
@@ -357,7 +357,7 @@ export const CertificationView: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Record storage:</span>
-                  <span>This browser only</span>
+                  <span>Your account</span>
                 </div>
               </div>
             </div>

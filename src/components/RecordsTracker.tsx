@@ -77,7 +77,7 @@ export const RecordsTracker: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
               <FileCheck className="w-4 h-4" />
-              <span>Local learning progress tracker · demo</span>
+              <span>Account-synced learning progress</span>
             </div>
 
             <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">

@@ -2,9 +2,11 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import cors from 'cors';
 import multer from 'multer';
 import pg from 'pg';
+import { randomUUID } from 'node:crypto';
 import { createClerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { publishableKeyFromHost } from '@clerk/shared/keys';
 import { clerkProxyMiddleware, CLERK_PROXY_PATH, getClerkProxyHost } from './middlewares/clerkProxyMiddleware';
+import { COURSE_MODULES } from '../src/data/courseData';
 
 const { Pool } = pg;
 const app = express();
@@ -14,6 +16,74 @@ const PORT = Number(process.env.PORT || 5000);
 const ADMIN_EMAIL = 'teamgog3@gmail.com';
 const SUBSCRIPTION_PRICE_ETB = 3900;
 const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
+const COURSE_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
+const COURSE_CHAPTERS_BY_ID = new Map(COURSE_CHAPTERS.map(chapter => [chapter.id, chapter]));
+
+type LearnerProgress = {
+  completedChapters: string[];
+  quizScores: Record<string, { score: number; maxScore: number; date: string }>;
+  certificateId: string | null;
+  certificateIssuedAt: string | null;
+};
+
+function progressFromRow(row: {
+  completed_chapters: string[];
+  quiz_scores: LearnerProgress['quizScores'];
+  certificate_id: string | null;
+  certificate_issued_at: Date | string | null;
+}): LearnerProgress {
+  return {
+    completedChapters: row.completed_chapters || [],
+    quizScores: row.quiz_scores || {},
+    certificateId: row.certificate_id,
+    certificateIssuedAt: row.certificate_issued_at
+      ? new Date(row.certificate_issued_at).toISOString()
+      : null,
+  };
+}
+
+function validateProgressInput(input: unknown): LearnerProgress | null {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
+  const value = input as Record<string, unknown>;
+  if (!Array.isArray(value.completedChapters) ||
+    !value.completedChapters.every(id => typeof id === 'string' && COURSE_CHAPTERS_BY_ID.has(id)) ||
+    !value.quizScores || typeof value.quizScores !== 'object' || Array.isArray(value.quizScores)) return null;
+
+  const completedChapters = [...new Set(value.completedChapters as string[])];
+  const quizScores: LearnerProgress['quizScores'] = {};
+  for (const [chapterId, rawScore] of Object.entries(value.quizScores)) {
+    const chapter = COURSE_CHAPTERS_BY_ID.get(chapterId);
+    if (!chapter || !rawScore || typeof rawScore !== 'object' || Array.isArray(rawScore)) return null;
+    const score = rawScore as Record<string, unknown>;
+    if (!Number.isInteger(score.score) || !Number.isInteger(score.maxScore) ||
+      score.maxScore !== chapter.quiz.length || (score.score as number) < 0 ||
+      (score.score as number) > chapter.quiz.length ||
+      typeof score.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(score.date) ||
+      Number.isNaN(Date.parse(`${score.date}T00:00:00.000Z`))) return null;
+    quizScores[chapterId] = {
+      score: score.score as number,
+      maxScore: score.maxScore as number,
+      date: score.date,
+    };
+  }
+
+  const certificateId = value.certificateId === null ? null : value.certificateId;
+  const certificateIssuedAt = value.certificateIssuedAt === null ? null : value.certificateIssuedAt;
+  const validCertificateId = certificateId === null ||
+    (typeof certificateId === 'string' && /^ET-IMPEX-\d{4}-[A-F0-9]{8}$/i.test(certificateId));
+  const validCertificateDate = certificateIssuedAt === null ||
+    (typeof certificateIssuedAt === 'string' && !Number.isNaN(Date.parse(certificateIssuedAt)));
+  if (!validCertificateId || !validCertificateDate ||
+    (certificateId === null) !== (certificateIssuedAt === null) ||
+    (certificateId !== null && completedChapters.length !== COURSE_CHAPTERS.length)) return null;
+
+  return {
+    completedChapters,
+    quizScores,
+    certificateId: certificateId as string | null,
+    certificateIssuedAt: certificateIssuedAt as string | null,
+  };
+}
 
 app.set('trust proxy', 1);
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
@@ -109,6 +179,124 @@ app.get('/api/me', async (_req, res) => {
     expiresAt: active ? latest.expires_at : null,
     paymentAmount: active ? SUBSCRIPTION_PRICE_ETB : 0,
   });
+});
+
+app.get('/api/progress', async (_req, res) => {
+  const identity = res.locals.identity as Identity;
+  const result = await pool.query(
+    `SELECT completed_chapters, quiz_scores, certificate_id, certificate_issued_at
+     FROM academy_learner_progress WHERE clerk_user_id = $1`,
+    [identity.userId],
+  );
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.json({ progress: result.rows[0] ? progressFromRow(result.rows[0]) : null });
+});
+
+// A local import is scoped to the authenticated learner. If two of their devices
+// initialize at once, retain both sets of completed chapters while preferring
+// values already present in PostgreSQL for quiz attempts and certificate state.
+app.put('/api/progress', async (req, res) => {
+  const identity = res.locals.identity as Identity;
+  const progress = validateProgressInput(req.body);
+  if (!progress) return res.status(400).json({ error: 'The saved learning progress is not valid.' });
+  await pool.query(
+    `INSERT INTO academy_learner_progress
+       (clerk_user_id, completed_chapters, quiz_scores, certificate_id, certificate_issued_at)
+     VALUES ($1, $2::text[], $3::jsonb, $4, $5::timestamptz)
+     ON CONFLICT (clerk_user_id) DO UPDATE SET
+       completed_chapters = ARRAY(
+         SELECT DISTINCT item.chapter_id
+         FROM unnest(academy_learner_progress.completed_chapters || EXCLUDED.completed_chapters) AS item(chapter_id)
+       ),
+       quiz_scores = EXCLUDED.quiz_scores || academy_learner_progress.quiz_scores,
+       certificate_id = COALESCE(academy_learner_progress.certificate_id, EXCLUDED.certificate_id),
+       certificate_issued_at = COALESCE(academy_learner_progress.certificate_issued_at, EXCLUDED.certificate_issued_at),
+       updated_at = now()`,
+    [
+      identity.userId,
+      progress.completedChapters,
+      JSON.stringify(progress.quizScores),
+      progress.certificateId,
+      progress.certificateIssuedAt,
+    ],
+  );
+  const result = await pool.query(
+    `SELECT completed_chapters, quiz_scores, certificate_id, certificate_issued_at
+     FROM academy_learner_progress WHERE clerk_user_id = $1`,
+    [identity.userId],
+  );
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.json({ progress: progressFromRow(result.rows[0]) });
+});
+
+app.patch('/api/progress', async (req, res) => {
+  const identity = res.locals.identity as Identity;
+  const action = req.body?.action;
+  let result;
+
+  if (action === 'chapter') {
+    const { chapterId, completed } = req.body;
+    if (!COURSE_CHAPTERS_BY_ID.has(chapterId) || typeof completed !== 'boolean') {
+      return res.status(400).json({ error: 'Choose a valid course chapter and completion state.' });
+    }
+    result = await pool.query(
+      `UPDATE academy_learner_progress
+       SET completed_chapters = CASE
+         WHEN $2::boolean THEN ARRAY(
+           SELECT DISTINCT item.chapter_id
+           FROM unnest(completed_chapters || ARRAY[$3]::text[]) AS item(chapter_id)
+         )
+         ELSE array_remove(completed_chapters, $3)
+       END, updated_at = now()
+       WHERE clerk_user_id = $1
+       RETURNING completed_chapters, quiz_scores, certificate_id, certificate_issued_at`,
+      [identity.userId, completed, chapterId],
+    );
+  } else if (action === 'quiz') {
+    const { chapterId, score } = req.body;
+    const chapter = COURSE_CHAPTERS_BY_ID.get(chapterId);
+    if (!chapter || !Number.isInteger(score) || score < 0 || score > chapter.quiz.length ||
+      chapter.quiz.length < 1) {
+      return res.status(400).json({ error: 'The quiz result is not valid for this chapter.' });
+    }
+    const date = new Date().toISOString().slice(0, 10);
+    result = await pool.query(
+      `UPDATE academy_learner_progress
+       SET completed_chapters = CASE WHEN $4::boolean THEN ARRAY(
+             SELECT DISTINCT item.chapter_id
+             FROM unnest(completed_chapters || ARRAY[$5]::text[]) AS item(chapter_id)
+           ) ELSE completed_chapters END,
+           quiz_scores = jsonb_set(
+             quiz_scores, ARRAY[$2::text],
+             jsonb_build_object('score', $3::integer, 'maxScore', $6::integer, 'date', $7::text),
+             true
+           ),
+           updated_at = now()
+       WHERE clerk_user_id = $1
+       RETURNING completed_chapters, quiz_scores, certificate_id, certificate_issued_at`,
+      [identity.userId, chapterId, score, score / chapter.quiz.length >= 0.6, chapterId, chapter.quiz.length, date],
+    );
+  } else if (action === 'certificate') {
+    const certificateId = `ET-IMPEX-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    result = await pool.query(
+      `UPDATE academy_learner_progress
+       SET certificate_id = COALESCE(certificate_id, $2),
+           certificate_issued_at = COALESCE(certificate_issued_at, now()),
+           updated_at = now()
+       WHERE clerk_user_id = $1 AND cardinality(completed_chapters) = $3
+       RETURNING completed_chapters, quiz_scores, certificate_id, certificate_issued_at`,
+      [identity.userId, certificateId, COURSE_CHAPTERS.length],
+    );
+    if (!result.rowCount) {
+      return res.status(409).json({ error: 'Complete every course chapter before issuing a course record.' });
+    }
+  } else {
+    return res.status(400).json({ error: 'Choose a valid progress update.' });
+  }
+
+  if (!result.rowCount) return res.status(404).json({ error: 'Your saved progress could not be found. Refresh and try again.' });
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.json({ progress: progressFromRow(result.rows[0]) });
 });
 
 app.get('/api/payment-settings', async (_req, res) => {

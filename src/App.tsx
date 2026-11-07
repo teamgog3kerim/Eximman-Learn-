@@ -25,7 +25,7 @@ const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
 const MainContent: React.FC = () => {
   const {
-    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal
+    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal, progressSaveError
   } = useApp();
   const [storageWarning, setStorageWarning] = useState(false);
 
@@ -51,9 +51,14 @@ const MainContent: React.FC = () => {
       <div className="no-print border-b border-[#ead7bb] bg-[#fff5e8] px-4 py-2.5 text-[#6b4c2b] dark:border-[#574633] dark:bg-[#392e22] dark:text-[#e9c99f]">
         <p className="mx-auto flex max-w-[1440px] items-start gap-2 text-[11px] leading-4 sm:items-center sm:text-xs">
           <Info className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" />
-          <span><strong>Learning workspace.</strong> Study progress is saved on this device. Telebirr payments are reviewed by the academy admin before subscription access begins.</span>
+          <span><strong>Learning workspace.</strong> Study progress is saved to your account and follows you between devices. Telebirr payments are reviewed by the academy admin before subscription access begins.</span>
         </p>
       </div>
+      {progressSaveError && (
+        <div role="alert" className="border-b border-rose-300 bg-rose-50 px-4 py-2.5 text-xs leading-5 text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-100">
+          <p className="mx-auto max-w-[1440px]"><strong>Progress was not saved.</strong> {progressSaveError}</p>
+        </div>
+      )}
 
       <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
         {isTool && (
@@ -138,7 +143,7 @@ export default function App() {
               {profileError && <p role="alert" className="mt-4 text-sm text-red-700">{profileError}</p>}
               <Link href="/sign-up" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-[#176b60] px-5 text-sm font-bold text-white transition hover:bg-[#14594f]">Create learner account</Link>
               <Link href="/sign-in" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border academy-line text-sm font-bold transition hover:bg-[#e6f1ed] dark:hover:bg-[#263a35]">Sign in with Google or email</Link>
-              <p className="mt-6 text-center text-[11px] leading-5 academy-muted">Use your account on different devices; saved lesson progress remains on this device for now.</p>
+              <p className="mt-6 text-center text-[11px] leading-5 academy-muted">Sign in with the same account on any device to continue where you left off.</p>
             </div>
           </div>
         </section>
