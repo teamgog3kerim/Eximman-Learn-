@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LandedCostCalculation } from '../types';
 import { Calculator, Download, Printer, RefreshCw, ChevronRight, ShieldAlert, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 // Default initial values taken directly from Page 1 & 2 of the reference PDF
 const DEFAULT_CALC_DATA: LandedCostCalculation = {
@@ -161,7 +162,8 @@ export const CostBreakdownSheet: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="academy-workspace space-y-8">
+      <AcademyWorkspaceSkin />
       {/* Header bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
         <div>
@@ -196,6 +198,9 @@ export const CostBreakdownSheet: React.FC = () => {
             <span>Print Official Sheet</span>
           </button>
         </div>
+      </div>
+      <div role="note" className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
+        Training estimate only. Rates, tariffs, and charges shown are illustrative inputs; confirm current bank, customs, port, and corridor requirements before making a commercial decision.
       </div>
 
       {/* Free trial gate reminder if not full access */}

@@ -23,6 +23,7 @@ import {
   ClipboardCheck
 } from 'lucide-react';
 import { ExportDocumentChecklistGenerator } from './ExportDocumentChecklistGenerator';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 
 export const CourseViewer: React.FC = () => {
@@ -91,7 +92,8 @@ export const CourseViewer: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div className="academy-workspace grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <AcademyWorkspaceSkin />
       {/* Left Sidebar: Curriculum Navigator */}
       <div className="lg:col-span-4 space-y-4">
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-xs">
@@ -574,6 +576,31 @@ export const CourseViewer: React.FC = () => {
                 {/* Corridor Flow Diagram */}
                 {(currentChapter.diagramType === 'corridor_flow' || currentChapter.moduleId === 'mod-3') && (
                   <div className="space-y-4">
+                    <figure className="academy-route-visual p-3 sm:p-5" aria-labelledby="corridor-visual-caption">
+                      <svg viewBox="0 0 760 150" role="img" aria-labelledby="corridor-title corridor-desc" className="w-full h-auto">
+                        <title id="corridor-title">Djibouti to Ethiopia import corridor</title>
+                        <desc id="corridor-desc">Cargo moves from the Port of Djibouti through corridor trucking to Mojo or Indode dry port, then onward to delivery and assembly.</desc>
+                        <path className="route-line" d="M80 58 H680" />
+                        <path d="M680 58l-12-7v14z" fill="var(--workspace-green)" />
+                        {[100, 290, 480, 660].map((x, index) => (
+                          <g key={x}>
+                            <circle className="route-node" cx={x} cy="58" r="12" />
+                            <text x={x} y="63" textAnchor="middle" className="route-label">{index + 1}</text>
+                          </g>
+                        ))}
+                        <text x="100" y="96" textAnchor="middle" className="route-label">Djibouti port</text>
+                        <text x="100" y="114" textAnchor="middle" className="route-note">Vessel discharge</text>
+                        <text x="290" y="96" textAnchor="middle" className="route-label">Transit corridor</text>
+                        <text x="290" y="114" textAnchor="middle" className="route-note">Galafi crossing</text>
+                        <text x="480" y="96" textAnchor="middle" className="route-label">Mojo / Indode</text>
+                        <text x="480" y="114" textAnchor="middle" className="route-note">e-SAD · inspection</text>
+                        <text x="660" y="96" textAnchor="middle" className="route-label">Delivery</text>
+                        <text x="660" y="114" textAnchor="middle" className="route-note">Warehouse · assembly</text>
+                      </svg>
+                      <figcaption id="corridor-visual-caption" className="px-1 pt-2 text-[11px] academy-muted">
+                        A practical sequence: port handling → transit → customs processing → inland delivery.
+                      </figcaption>
+                    </figure>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <div className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-800 text-center">
                         <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center mx-auto text-xs">

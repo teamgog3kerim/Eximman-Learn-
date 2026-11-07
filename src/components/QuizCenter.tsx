@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { COURSE_MODULES } from '../data/courseData';
 import { useApp } from '../context/AppContext';
 import { HelpCircle, CheckCircle2, Lock, ArrowRight, RotateCcw, Award } from 'lucide-react';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const QuizCenter: React.FC = () => {
   const {
@@ -62,7 +63,8 @@ export const QuizCenter: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="academy-workspace space-y-8 max-w-4xl mx-auto">
+      <AcademyWorkspaceSkin />
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">

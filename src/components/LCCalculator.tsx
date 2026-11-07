@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { FileText, CheckCircle2, DollarSign, ArrowRight, Printer, RotateCcw, AlertTriangle, Layers } from 'lucide-react';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const LCCalculator: React.FC = () => {
   const { hasFullAccess, setShowPaywallModal } = useApp();
@@ -139,7 +140,8 @@ export const LCCalculator: React.FC = () => {
     c2Lot2TotalFreightDebit;
 
   return (
-    <div className="space-y-6">
+    <div className="academy-workspace space-y-6">
+      <AcademyWorkspaceSkin />
       {/* Header banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
         <div>
@@ -179,6 +181,9 @@ export const LCCalculator: React.FC = () => {
             CASE 2 — PARTIAL SHIPMENT
           </button>
         </div>
+      </div>
+      <div role="note" className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
+        Learning model, not a bank quotation. Verify exchange rates, margin terms, fees, and settlement treatment with the issuing bank before use.
       </div>
 
       {/* Case 1: Full Shipment View */}

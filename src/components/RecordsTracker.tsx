@@ -19,6 +19,7 @@ import {
   User,
   Calendar
 } from 'lucide-react';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const RecordsTracker: React.FC = () => {
   const {
@@ -70,7 +71,8 @@ export const RecordsTracker: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="academy-workspace space-y-8">
+      <AcademyWorkspaceSkin />
       {/* Student Dossier Header Card */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-8 shadow-xs relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">

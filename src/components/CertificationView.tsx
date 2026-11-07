@@ -20,6 +20,7 @@ import {
   Check,
   X
 } from 'lucide-react';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const CertificationView: React.FC = () => {
   const {
@@ -61,7 +62,8 @@ export const CertificationView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="academy-workspace space-y-8">
+      <AcademyWorkspaceSkin />
       {/* Top Banner & Control Card */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-8 shadow-xs no-print space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

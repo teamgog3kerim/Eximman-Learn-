@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Calculator, Printer, RotateCcw, FileDown, ShieldCheck, HelpCircle } from 'lucide-react';
+import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const TaxAssessmentCalculator: React.FC = () => {
   const { hasFullAccess, setShowPaywallModal } = useApp();
@@ -95,7 +96,8 @@ export const TaxAssessmentCalculator: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="academy-workspace space-y-8">
+      <AcademyWorkspaceSkin />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
         <div>
@@ -126,6 +128,9 @@ export const TaxAssessmentCalculator: React.FC = () => {
             <span>Print</span>
           </button>
         </div>
+      </div>
+      <div role="note" className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
+        Educational estimate only. Applicable rates and taxable bases depend on the goods and current customs rules; confirm classification and assessment with the relevant authority.
       </div>
 
       {/* Card: CIF & Taxable Amount */}
