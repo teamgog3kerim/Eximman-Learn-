@@ -1,4 +1,4 @@
-import express, { type NextFunction, type Request, type Response } from 'express';
+import express, { type NextFunction, type Request, type RequestHandler, type Response } from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import pg from 'pg';
@@ -18,6 +18,11 @@ const SUBSCRIPTION_PRICE_ETB = 3900;
 const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 const COURSE_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
 const COURSE_CHAPTERS_BY_ID = new Map(COURSE_CHAPTERS.map(chapter => [chapter.id, chapter]));
+const asyncRoute = (
+  handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
+): RequestHandler => (req, res, next) => {
+  void handler(req, res, next).catch(next);
+};
 
 type LearnerProgress = {
   completedChapters: string[];
@@ -181,7 +186,7 @@ app.get('/api/me', async (_req, res) => {
   });
 });
 
-app.get('/api/progress', async (_req, res) => {
+app.get('/api/progress', asyncRoute(async (_req, res) => {
   const identity = res.locals.identity as Identity;
   const result = await pool.query(
     `SELECT completed_chapters, quiz_scores, certificate_id, certificate_issued_at
@@ -190,12 +195,12 @@ app.get('/api/progress', async (_req, res) => {
   );
   res.setHeader('Cache-Control', 'private, no-store');
   res.json({ progress: result.rows[0] ? progressFromRow(result.rows[0]) : null });
-});
+}));
 
 // A local import is scoped to the authenticated learner. If two of their devices
 // initialize at once, retain both sets of completed chapters while preferring
 // values already present in PostgreSQL for quiz attempts and certificate state.
-app.put('/api/progress', async (req, res) => {
+app.put('/api/progress', asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   const progress = validateProgressInput(req.body);
   if (!progress) return res.status(400).json({ error: 'The saved learning progress is not valid.' });
@@ -227,9 +232,9 @@ app.put('/api/progress', async (req, res) => {
   );
   res.setHeader('Cache-Control', 'private, no-store');
   res.json({ progress: progressFromRow(result.rows[0]) });
-});
+}));
 
-app.patch('/api/progress', async (req, res) => {
+app.patch('/api/progress', asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   const action = req.body?.action;
   let result;
@@ -297,7 +302,7 @@ app.patch('/api/progress', async (req, res) => {
   if (!result.rowCount) return res.status(404).json({ error: 'Your saved progress could not be found. Refresh and try again.' });
   res.setHeader('Cache-Control', 'private, no-store');
   res.json({ progress: progressFromRow(result.rows[0]) });
-});
+}));
 
 app.get('/api/payment-settings', async (_req, res) => {
   const result = await pool.query(
