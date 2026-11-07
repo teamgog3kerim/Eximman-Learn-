@@ -25,7 +25,8 @@ const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
 const MainContent: React.FC = () => {
   const {
-    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal, progressSaveError
+    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal, progressSaveError,
+    progressSaveNotice, pendingProgressCount, progressSaving, retryProgressSave, discardPendingProgress
   } = useApp();
   const [storageWarning, setStorageWarning] = useState(false);
 
@@ -55,8 +56,25 @@ const MainContent: React.FC = () => {
         </p>
       </div>
       {progressSaveError && (
-        <div role="alert" className="border-b border-rose-300 bg-rose-50 px-4 py-2.5 text-xs leading-5 text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-100">
-          <p className="mx-auto max-w-[1440px]"><strong>Progress was not saved.</strong> {progressSaveError}</p>
+        <div role="alert" className="border-b border-rose-300 bg-rose-50 px-4 py-3 text-xs leading-5 text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-100">
+          <div className="mx-auto flex max-w-[1440px] flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p><strong>Progress was not saved.</strong> {progressSaveError} {pendingProgressCount > 0 && `${pendingProgressCount} update${pendingProgressCount === 1 ? '' : 's'} still need saving.`}</p>
+            {pendingProgressCount > 0 && (
+              <div className="flex shrink-0 gap-2">
+                <button type="button" onClick={retryProgressSave} disabled={progressSaving} className="rounded-lg bg-rose-800 px-3 py-1.5 font-bold text-white hover:bg-rose-900 disabled:cursor-wait disabled:opacity-60">
+                  {progressSaving ? 'Saving…' : 'Retry save'}
+                </button>
+                <button type="button" onClick={discardPendingProgress} disabled={progressSaving} className="rounded-lg border border-rose-400 px-3 py-1.5 font-semibold hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-rose-900/40">
+                  Discard
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {progressSaveNotice && (
+        <div role="status" className="border-b border-emerald-300 bg-emerald-50 px-4 py-2.5 text-xs leading-5 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100">
+          <p className="mx-auto max-w-[1440px]"><strong>Saved.</strong> {progressSaveNotice}</p>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { UserProfile } from '../types';
 import { COURSE_MODULES } from '../data/courseData';
 
@@ -42,6 +42,11 @@ interface AppContextType {
   quizScores: Record<string, { score: number; maxScore: number; date: string }>;
   recordQuizScore: (chapterId: string, score: number, maxScore: number) => void;
   progressSaveError: string;
+  progressSaveNotice: string;
+  pendingProgressCount: number;
+  progressSaving: boolean;
+  retryProgressSave: () => void;
+  discardPendingProgress: () => void;
 }
 
 const STORAGE_KEY_USERS = 'ethio_impex_users_v3';
@@ -49,7 +54,13 @@ const STORAGE_KEY_CURRENT_USER = 'ethio_impex_curr_user_v3';
 const STORAGE_KEY_THEME = 'ethio_impex_theme';
 const STORAGE_KEY_QUIZ_SCORES = 'ethio_impex_quiz_scores_v3';
 const STORAGE_KEY_USER_QUIZZES = 'ethio_impex_user_quizzes_v1';
+const STORAGE_KEY_PENDING_PROGRESS = 'ethio_impex_pending_progress_v1';
 type QuizScores = Record<string, { score: number; maxScore: number; date: string }>;
+type ProgressAction =
+  | { action: 'chapter'; chapterId: string; completed: boolean }
+  | { action: 'quiz'; chapterId: string; score: number }
+  | { action: 'certificate' };
+type PendingProgressAction = { id: string; action: ProgressAction };
 type LearnerProgress = {
   completedChapters: string[];
   quizScores: QuizScores;
@@ -58,6 +69,26 @@ type LearnerProgress = {
 };
 const ALL_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
 const CHAPTER_IDS = new Set(ALL_CHAPTERS.map(chapter => chapter.id));
+const readPendingProgress = (userId: string): PendingProgressAction[] => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(`${STORAGE_KEY_PENDING_PROGRESS}:${userId}`) || '[]');
+    if (!Array.isArray(stored)) return [];
+    return stored.filter((item): item is PendingProgressAction => {
+      if (!item || typeof item.id !== 'string' || !item.action || typeof item.action !== 'object') return false;
+      if (item.action.action === 'chapter') {
+        return CHAPTER_IDS.has(item.action.chapterId) && typeof item.action.completed === 'boolean';
+      }
+      if (item.action.action === 'quiz') {
+        const chapter = ALL_CHAPTERS.find(value => value.id === item.action.chapterId);
+        return !!chapter && Number.isInteger(item.action.score) &&
+          item.action.score >= 0 && item.action.score <= chapter.quiz.length;
+      }
+      return item.action.action === 'certificate';
+    });
+  } catch {
+    return [];
+  }
+};
 const EMPTY_PROGRESS: LearnerProgress = {
   completedChapters: [],
   quizScores: {},
@@ -157,8 +188,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
   const [progressOwnerId, setProgressOwnerId] = useState<string | null>(null);
   const [progressLoading, setProgressLoading] = useState(true);
   const [progressLoadError, setProgressLoadError] = useState('');
-  const [progressSaveError, setProgressSaveError] = useState('');
+  const [progressSaveError, setProgressSaveError] = useState(
+    () => readPendingProgress(profile.id).length ? 'Some progress updates are waiting to be saved.' : '',
+  );
+  const [progressSaveNotice, setProgressSaveNotice] = useState('');
+  const [pendingProgressActions, setPendingProgressActions] = useState<PendingProgressAction[]>(
+    () => readPendingProgress(profile.id),
+  );
+  const [progressSaving, setProgressSaving] = useState(false);
+  const pendingProgressActionsRef = useRef(pendingProgressActions);
+  const progressSaveInFlight = useRef(false);
+  const progressActionId = useRef(0);
   const [progressRetry, setProgressRetry] = useState(0);
+
+  const replacePendingProgressActions = (actions: PendingProgressAction[], userId = profile.id) => {
+    pendingProgressActionsRef.current = actions;
+    setPendingProgressActions(actions);
+    saveLocal(`${STORAGE_KEY_PENDING_PROGRESS}:${userId}`, JSON.stringify(actions));
+  };
+
+  useEffect(() => {
+    const actions = readPendingProgress(profile.id);
+    pendingProgressActionsRef.current = actions;
+    setPendingProgressActions(actions);
+    setProgressSaveError(actions.length ? 'Some progress updates are waiting to be saved.' : '');
+    setProgressSaveNotice('');
+  }, [profile.id]);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
@@ -308,41 +363,90 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
     return completedChapters.includes(chapterId);
   };
 
-  const saveProgressAction = async (action: Record<string, unknown>) => {
-    setProgressSaveError('');
+  const processPendingProgressActions = async (isRetry = false) => {
+    if (progressSaveInFlight.current || !pendingProgressActionsRef.current.length) return;
+    progressSaveInFlight.current = true;
+    setProgressSaving(true);
+    if (isRetry) setProgressSaveNotice('');
     try {
-      if (!progress) {
-        const initializeResponse = await fetch('/api/progress', {
-          method: 'PUT',
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(EMPTY_PROGRESS),
-        });
-        if (!initializeResponse.ok) throw new Error('Your saved progress could not be initialized.');
-        setProgress((await initializeResponse.json()).progress);
+      let hasProgress = Boolean(progress);
+      let savedDuringRetry = 0;
+      while (pendingProgressActionsRef.current.length) {
+        const current = pendingProgressActionsRef.current[0];
+        try {
+          if (!hasProgress) {
+            const initializeResponse = await fetch('/api/progress', {
+              method: 'PUT',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(EMPTY_PROGRESS),
+            });
+            if (!initializeResponse.ok) throw new Error('Your saved progress could not be initialized.');
+            const initialized = await initializeResponse.json();
+            setProgress(initialized.progress);
+            hasProgress = true;
+          }
+          const response = await fetch('/api/progress', {
+            method: 'PATCH',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(current.action),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Your progress could not be saved.');
+          setProgress(result.progress);
+          setUserQuizScores(previous => ({ ...previous, [profile.id]: result.progress.quizScores }));
+          replacePendingProgressActions(pendingProgressActionsRef.current.slice(1));
+          setProgressSaveError('');
+          if (isRetry) {
+            savedDuringRetry += 1;
+            setProgressSaveNotice(`Saved ${savedDuringRetry} progress update${savedDuringRetry === 1 ? '' : 's'}.`);
+          }
+        } catch (error) {
+          setProgressSaveError(error instanceof Error ? error.message : 'Your progress could not be saved.');
+          return;
+        }
       }
-      const response = await fetch('/api/progress', {
-        method: 'PATCH',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(action),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Your progress could not be saved.');
-      setProgress(result.progress);
-      setUserQuizScores(previous => ({ ...previous, [profile.id]: result.progress.quizScores }));
-    } catch (error) {
-      setProgressSaveError(error instanceof Error ? error.message : 'Your progress could not be saved.');
+    } finally {
+      progressSaveInFlight.current = false;
+      setProgressSaving(false);
     }
+  };
+
+  const saveProgressAction = (action: ProgressAction) => {
+    setProgressSaveError('');
+    setProgressSaveNotice('');
+    const next = [...pendingProgressActionsRef.current, {
+      id: `${Date.now()}-${++progressActionId.current}`,
+      action,
+    }];
+    replacePendingProgressActions(next);
+    void processPendingProgressActions();
+  };
+
+  const retryProgressSave = () => {
+    void processPendingProgressActions(true);
+  };
+
+  const discardPendingProgress = () => {
+    if (progressSaveInFlight.current) return;
+    replacePendingProgressActions([]);
+    setProgressSaveError('');
+    setProgressSaveNotice('');
   };
 
   const toggleChapterComplete = async (chapterId: string) => {
     const chapter = ALL_CHAPTERS.find(ch => ch.id === chapterId);
     if (!chapter || (!hasFullAccess && !chapter.isFreeTrialAccessible)) return;
+    const queuedChapter = [...pendingProgressActionsRef.current].reverse()
+      .find(item => item.action.action === 'chapter' && item.action.chapterId === chapterId);
+    const currentlyCompleted = queuedChapter && queuedChapter.action.action === 'chapter'
+      ? queuedChapter.action.completed
+      : completedChapters.includes(chapterId);
     await saveProgressAction({
       action: 'chapter',
       chapterId,
-      completed: !completedChapters.includes(chapterId),
+      completed: !currentlyCompleted,
     });
   };
 
@@ -468,6 +572,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
         quizScores,
         recordQuizScore,
         progressSaveError,
+        progressSaveNotice,
+        pendingProgressCount: pendingProgressActions.length,
+        progressSaving,
+        retryProgressSave,
+        discardPendingProgress,
       }}
     >
       {children}
