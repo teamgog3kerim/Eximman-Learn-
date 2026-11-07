@@ -138,7 +138,7 @@ export default function App() {
               {profileError && <p role="alert" className="mt-4 text-sm text-red-700">{profileError}</p>}
               <Link href="/sign-up" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-[#176b60] px-5 text-sm font-bold text-white transition hover:bg-[#14594f]">Create learner account</Link>
               <Link href="/sign-in" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border academy-line text-sm font-bold transition hover:bg-[#e6f1ed] dark:hover:bg-[#263a35]">Sign in with Google or email</Link>
-              <p className="mt-6 text-center text-[11px] leading-5 academy-muted">Your account lets you resume your learning on another device.</p>
+              <p className="mt-6 text-center text-[11px] leading-5 academy-muted">Use your account on different devices; saved lesson progress remains on this device for now.</p>
             </div>
           </div>
         </section>

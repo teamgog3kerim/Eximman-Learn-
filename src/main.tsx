@@ -68,13 +68,15 @@ function ClerkRoutes() {
     >
       <Switch>
         <Route path="/sign-in/*?">
-          <div className="flex min-h-[100dvh] items-center justify-center bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
+          <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
             <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+            <p className="max-w-md text-center text-xs leading-5 text-[#697873]">If sign-in methods do not appear, enable Google under Replit’s Users & Auth settings.</p>
           </div>
         </Route>
         <Route path="/sign-up/*?">
-          <div className="flex min-h-[100dvh] items-center justify-center bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
+          <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
             <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+            <p className="max-w-md text-center text-xs leading-5 text-[#697873]">Enable Google under Replit’s Users & Auth settings for Google account sign-in.</p>
           </div>
         </Route>
         <Route path="/" component={App} />

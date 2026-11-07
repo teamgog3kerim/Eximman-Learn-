@@ -1,0 +1,1 @@
+- [Academy scope](academy-scope.md) — Preserve the imported curriculum, quizzes, progress, calculators, and certificates when changing account or payment flows.

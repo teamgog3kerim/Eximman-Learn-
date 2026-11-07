@@ -105,7 +105,7 @@ app.get('/api/me', async (_req, res) => {
     email: identity.email,
     fullName: identity.name,
     role: identity.isAdmin ? 'admin' : 'user',
-    subscriptionStatus: active ? 'active_paid' : 'free_trial',
+    subscriptionStatus: active ? 'active_paid' : latest ? 'expired' : 'free_trial',
     expiresAt: active ? latest.expires_at : null,
     paymentAmount: active ? SUBSCRIPTION_PRICE_ETB : 0,
   });
@@ -173,12 +173,17 @@ app.get('/api/admin/users', requireAdmin, async (_req, res) => {
       `SELECT status, expires_at FROM academy_payment_requests WHERE clerk_user_id = $1 ORDER BY submitted_at DESC LIMIT 1`,
       [user.id],
     );
+    const latestStatus = latest.rows[0]?.status === 'approved'
+      && latest.rows[0]?.expires_at
+      && new Date(latest.rows[0].expires_at).getTime() <= Date.now()
+      ? 'expired'
+      : latest.rows[0]?.status || 'free_trial';
     return {
       id: user.id,
       email: primary?.emailAddress || '',
       name: [user.firstName, user.lastName].filter(Boolean).join(' ') || primary?.emailAddress || 'Learner',
       role: primary?.emailAddress.toLowerCase() === ADMIN_EMAIL ? 'admin' : 'user',
-      subscriptionStatus: latest.rows[0]?.status || 'free_trial',
+      subscriptionStatus: latestStatus,
       expiresAt: latest.rows[0]?.expires_at || null,
     };
   }));
