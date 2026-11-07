@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Calculator, Printer, RotateCcw, FileDown, ShieldCheck, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Calculator, Printer, RotateCcw, FileDown, ShieldCheck, HelpCircle } from 'lucide-react';
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const TaxAssessmentCalculator: React.FC = () => {
-  const { hasFullAccess, setShowPaywallModal } = useApp();
+  const { hasFullAccess, setShowPaywallModal, setActiveNavTab } = useApp();
 
   const [itemDescription, setItemDescription] = useState<string>('Toyota Spare Parts — 1 Container');
   const [units, setUnits] = useState<number>(1);
@@ -112,7 +112,16 @@ export const TaxAssessmentCalculator: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 no-print">
+        <div className="flex flex-wrap items-center gap-2 no-print">
+          <button
+            type="button"
+            onClick={() => setActiveNavTab('overview')}
+            aria-label="Back to overview"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to overview</span>
+          </button>
           <button
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { FileText, CheckCircle2, DollarSign, ArrowRight, Printer, RotateCcw, AlertTriangle, Layers } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle2, DollarSign, ArrowRight, Printer, RotateCcw, AlertTriangle, Layers } from 'lucide-react';
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const LCCalculator: React.FC = () => {
-  const { hasFullAccess, setShowPaywallModal } = useApp();
+  const { hasFullAccess, setShowPaywallModal, setActiveNavTab } = useApp();
   const [activeCase, setActiveCase] = useState<'case1' | 'case2'>('case2');
 
   // Case 1 State (Full Shipment - seeded with PDF Page 3 data)
@@ -158,28 +158,39 @@ export const LCCalculator: React.FC = () => {
           </p>
         </div>
 
-        {/* Tab switch between Case 1 and Case 2 */}
-        <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl border border-neutral-200 dark:border-neutral-700">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <button
-            onClick={() => setActiveCase('case1')}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeCase === 'case1'
-                ? 'bg-amber-800 text-white shadow-xs'
-                : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
+            type="button"
+            onClick={() => setActiveNavTab('overview')}
+            aria-label="Back to overview"
+            className="inline-flex min-h-10 items-center gap-1.5 self-start rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
           >
-            CASE 1 — FULL SHIPMENT
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to overview</span>
           </button>
-          <button
-            onClick={() => setActiveCase('case2')}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeCase === 'case2'
-                ? 'bg-amber-800 text-white shadow-xs'
-                : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
-          >
-            CASE 2 — PARTIAL SHIPMENT
-          </button>
+          {/* Tab switch between Case 1 and Case 2 */}
+          <div className="flex w-full max-w-full items-center bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl border border-neutral-200 dark:border-neutral-700 sm:w-fit">
+            <button
+              onClick={() => setActiveCase('case1')}
+              className={`min-w-0 flex-1 px-2 py-2 text-center text-[10px] leading-4 font-semibold rounded-lg transition-all sm:flex-none sm:px-4 sm:text-xs ${
+                activeCase === 'case1'
+                  ? 'bg-amber-800 text-white shadow-xs'
+                  : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100'
+              }`}
+            >
+              CASE 1 — FULL SHIPMENT
+            </button>
+            <button
+              onClick={() => setActiveCase('case2')}
+              className={`min-w-0 flex-1 px-2 py-2 text-center text-[10px] leading-4 font-semibold rounded-lg transition-all sm:flex-none sm:px-4 sm:text-xs ${
+                activeCase === 'case2'
+                  ? 'bg-amber-800 text-white shadow-xs'
+                  : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100'
+              }`}
+            >
+              CASE 2 — PARTIAL SHIPMENT
+            </button>
+          </div>
         </div>
       </div>
       <div role="note" className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">

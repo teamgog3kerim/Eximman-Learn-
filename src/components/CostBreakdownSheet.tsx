@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LandedCostCalculation } from '../types';
-import { Calculator, Download, Printer, RefreshCw, ChevronRight, ShieldAlert, CheckCircle2, TrendingUp, Info } from 'lucide-react';
+import { ArrowLeft, Calculator, Download, Printer, RefreshCw, ChevronRight, ShieldAlert, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
@@ -47,7 +47,7 @@ const DEFAULT_CALC_DATA: LandedCostCalculation = {
 };
 
 export const CostBreakdownSheet: React.FC = () => {
-  const { hasFullAccess, setShowPaywallModal } = useApp();
+  const { hasFullAccess, setShowPaywallModal, setActiveNavTab } = useApp();
   const [data, setData] = useState<LandedCostCalculation>(DEFAULT_CALC_DATA);
   const [selectedMargin, setSelectedMargin] = useState<number>(100);
 
@@ -182,7 +182,16 @@ export const CostBreakdownSheet: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 no-print">
+        <div className="flex flex-wrap items-center gap-2 no-print">
+          <button
+            type="button"
+            onClick={() => setActiveNavTab('overview')}
+            aria-label="Back to overview"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to overview</span>
+          </button>
           <button
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
