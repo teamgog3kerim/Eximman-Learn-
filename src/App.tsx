@@ -5,8 +5,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useUser } from '@clerk/react';
-import { Link } from 'wouter';
 import { AppProvider, useApp } from './context/AppContext';
+import { PublicLanding } from './components/PublicLanding';
 import { Navbar } from './components/Navbar';
 import { LearningDashboard } from './components/LearningDashboard';
 import { CourseViewer } from './components/CourseViewer';
@@ -127,28 +127,7 @@ export default function App() {
 
   if (!isLoaded && isSignedIn) return <div className="flex min-h-screen items-center justify-center text-sm academy-muted">Loading your learning workspace…</div>;
   if (!isSignedIn) {
-    return (
-      <main className="academy-shell flex min-h-screen items-center justify-center px-5 py-12">
-        <section className="w-full max-w-5xl overflow-hidden rounded-[28px] border academy-line academy-card shadow-xl">
-          <div className="grid md:grid-cols-[1.2fr_.8fr]">
-            <div className="bg-[#174f49] p-8 text-white sm:p-12">
-              <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 font-bold text-[#efcf9e]">ET</span><span className="text-xs font-bold uppercase tracking-[.18em] text-white/75">Ethio-ImpEx Academy</span></div>
-              <p className="mt-14 text-xs font-bold uppercase tracking-[.18em] text-[#efcf9e]">Trade learning workspace</p>
-              <h1 className="mt-3 max-w-lg font-serif-title text-4xl font-extrabold tracking-tight sm:text-5xl">Learn trade. Move goods with confidence.</h1>
-              <p className="mt-5 max-w-lg text-sm leading-6 text-white/80">Build practical knowledge of importing, exporting and logistics in Ethiopia—supported by structured lessons and trade tools.</p>
-            </div>
-            <div className="flex flex-col justify-center p-8 sm:p-12">
-              <h2 className="font-serif-title text-2xl font-bold">Continue your learning</h2>
-              <p className="mt-2 text-sm leading-6 academy-muted">Create an account or sign in to access your curriculum, progress and subscription status.</p>
-              {profileError && <p role="alert" className="mt-4 text-sm text-red-700">{profileError}</p>}
-              <Link href="/sign-up" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-[#176b60] px-5 text-sm font-bold text-white transition hover:bg-[#14594f]">Create learner account</Link>
-              <Link href="/sign-in" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border academy-line text-sm font-bold transition hover:bg-[#e6f1ed] dark:hover:bg-[#263a35]">Sign in with Google or email</Link>
-              <p className="mt-6 text-center text-[11px] leading-5 academy-muted">Sign in with the same account on any device to continue where you left off.</p>
-            </div>
-          </div>
-        </section>
-      </main>
-    );
+    return <PublicLanding />;
   }
   if (!profile) return <div className="flex min-h-screen items-center justify-center px-6 text-sm academy-muted">{profileError || 'Loading your account…'}</div>;
   return (

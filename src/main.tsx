@@ -4,6 +4,7 @@ import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { Route, Router as WouterRouter, Switch, useLocation } from 'wouter';
 import App from './App';
+import { PublicAuthShell } from './components/PublicAuthShell';
 import './index.css';
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -68,16 +69,14 @@ function ClerkRoutes() {
     >
       <Switch>
         <Route path="/sign-in/*?">
-          <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
+          <PublicAuthShell mode="sign-in">
             <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
-            <p className="max-w-md text-center text-xs leading-5 text-[#697873]">If sign-in methods do not appear, enable Google under Replit’s Users & Auth settings.</p>
-          </div>
+          </PublicAuthShell>
         </Route>
         <Route path="/sign-up/*?">
-          <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-[#f6f5ef] px-4 py-10 dark:bg-[#171c1a]">
+          <PublicAuthShell mode="sign-up">
             <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
-            <p className="max-w-md text-center text-xs leading-5 text-[#697873]">Enable Google under Replit’s Users & Auth settings for Google account sign-in.</p>
-          </div>
+          </PublicAuthShell>
         </Route>
         <Route path="/" component={App} />
         <Route component={App} />
