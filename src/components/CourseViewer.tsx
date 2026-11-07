@@ -48,6 +48,7 @@ export const CourseViewer: React.FC = () => {
   // Locate active chapter & module
   let currentModule = COURSE_MODULES[0];
   let currentChapter: Chapter = COURSE_MODULES[0].chapters[0];
+  const allChapters = COURSE_MODULES.flatMap(module => module.chapters);
 
   for (const mod of COURSE_MODULES) {
     const found = mod.chapters.find(c => c.id === selectedChapterId);
@@ -57,6 +58,11 @@ export const CourseViewer: React.FC = () => {
       break;
     }
   }
+  const selectedIndex = allChapters.findIndex(chapter => chapter.id === currentChapter.id);
+  const previousChapter = allChapters[selectedIndex - 1];
+  const nextChapter = allChapters[selectedIndex + 1];
+  const canOpenChapter = (chapter?: Chapter) =>
+    !!chapter && (hasFullAccess || chapter.isFreeTrialAccessible);
 
   const isLocked = !hasFullAccess && !currentChapter.isFreeTrialAccessible;
 
@@ -392,6 +398,25 @@ export const CourseViewer: React.FC = () => {
         </div>
 
         {/* LOCKED CHAPTER PAYWALL OVERLAY */}
+        <nav aria-label="Lesson navigation" className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            disabled={!canOpenChapter(previousChapter)}
+            onClick={() => previousChapter && setSelectedChapterId(previousChapter.id)}
+            className="min-h-10 rounded-xl border academy-line px-4 text-sm font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35]"
+          >
+            ← Previous lesson
+          </button>
+          <span className="text-xs academy-muted">{selectedIndex + 1} of {allChapters.length}</span>
+          <button
+            type="button"
+            disabled={!canOpenChapter(nextChapter)}
+            onClick={() => nextChapter && setSelectedChapterId(nextChapter.id)}
+            className="min-h-10 rounded-xl border academy-line px-4 text-sm font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35]"
+          >
+            Next lesson →
+          </button>
+        </nav>
         {isLocked ? (
           <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 text-center space-y-4 shadow-sm">
             <div className="w-14 h-14 bg-amber-100 dark:bg-amber-950/60 rounded-full flex items-center justify-center mx-auto text-amber-700 dark:text-amber-400">

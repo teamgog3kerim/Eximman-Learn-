@@ -88,7 +88,7 @@ const SEED_USERS: UserProfile[] = [
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserProfile }> = ({ children, profile }) => {
   const [users, setUsers] = useState<UserProfile[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_USERS);
@@ -106,15 +106,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return SEED_USERS;
   });
 
-  const [currentUserId, setCurrentUserId] = useState<string>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
-      if (stored) return stored;
-    } catch (e) {
-      console.error(e);
-    }
-    return 'user-01';
-  });
+  const [currentUserId, setCurrentUserId] = useState<string>(profile.id);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
@@ -170,7 +162,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const currentUser = users.find(u => u.id === currentUserId) || users[0] || SEED_USERS[0];
+  useEffect(() => {
+    setCurrentUserId(profile.id);
+    setUsers(previous => {
+      const saved = previous.find(user => user.id === profile.id);
+      const next = { ...(saved || profile), ...profile, completedChapters: saved?.completedChapters || profile.completedChapters };
+      return saved ? previous.map(user => user.id === profile.id ? next : user) : [next, ...previous];
+    });
+  }, [profile.id, profile.email, profile.fullName, profile.role, profile.subscriptionStatus, profile.expiresAt]);
+  const currentUser = { ...(users.find(u => u.id === profile.id) || SEED_USERS[1]), ...profile };
   const quizScores = userQuizScores[currentUser.id] || {};
   const isAdmin = currentUser.role === 'admin';
 
