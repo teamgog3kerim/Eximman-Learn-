@@ -194,14 +194,14 @@ export const CostBreakdownSheet: React.FC = () => {
           </button>
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+            className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Reset Demo Values</span>
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-white bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 rounded-lg shadow-sm transition-colors"
+            className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-xs font-medium text-white bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 rounded-lg shadow-sm transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Official Sheet</span>
@@ -234,7 +234,7 @@ export const CostBreakdownSheet: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Landed Cost</span>
-          <div className="text-xl md:text-2xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1">
+          <div className="break-all text-lg font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1 md:text-2xl">
             ETB {formatETB(totalLandedCostETB)}
           </div>
           <span className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 block">
@@ -244,7 +244,7 @@ export const CostBreakdownSheet: React.FC = () => {
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Effective Cost Rate</span>
-          <div className="text-xl md:text-2xl font-bold font-mono-numbers text-amber-700 dark:text-amber-400 mt-1">
+          <div className="break-all text-lg font-bold font-mono-numbers text-amber-700 dark:text-amber-400 mt-1 md:text-2xl">
             {costRatePerUSD.toFixed(2)} ETB
           </div>
           <span className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 block">
@@ -254,7 +254,7 @@ export const CostBreakdownSheet: React.FC = () => {
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Settlement Forex Rate</span>
-          <div className="text-xl md:text-2xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1">
+          <div className="break-all text-lg font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1 md:text-2xl">
             {data.exchangeRateSettlement.toFixed(4)}
           </div>
           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 block">
@@ -264,7 +264,7 @@ export const CostBreakdownSheet: React.FC = () => {
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">2-Month Projected Sales Value</span>
-          <div className="text-xl md:text-2xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1">
+          <div className="break-all text-lg font-bold font-mono-numbers text-neutral-900 dark:text-neutral-50 mt-1 md:text-2xl">
             ETB {formatETB(totalLandedCostETB * (1 + forecasted2MonthsPct / 100))}
           </div>
           <span className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 block">
@@ -368,7 +368,7 @@ export const CostBreakdownSheet: React.FC = () => {
 
       {/* The Full Cost Buildup Table (Replicating Page 1) */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
-        <div className="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             Section 1 to 5: Itemized Landed Cost Accounting Table (ETB)
           </div>
@@ -377,7 +377,7 @@ export const CostBreakdownSheet: React.FC = () => {
           </span>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" role="region" aria-label="Scrollable landed cost accounting table" tabIndex={0}>
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-neutral-100/70 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-neutral-700 font-semibold">
@@ -600,7 +600,7 @@ export const CostBreakdownSheet: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" role="region" aria-label="Scrollable commercial pricing table" tabIndex={0}>
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-neutral-100/70 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-300 border-b border-neutral-200 dark:border-neutral-700 font-semibold">

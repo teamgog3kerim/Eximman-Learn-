@@ -89,7 +89,7 @@ export const RecordsTracker: React.FC = () => {
             <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-neutral-400" />
-                <span>{currentUser.email || 'No email saved'}</span>
+                <span className="break-all">{currentUser.email || 'No email saved'}</span>
               </span>
               <span>·</span>
               {currentUser.phoneNumber && <span>Mobile: {currentUser.phoneNumber}</span>}
@@ -131,7 +131,7 @@ export const RecordsTracker: React.FC = () => {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 no-print">
             <button
               onClick={handlePrint}
-              className="py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+              className="min-h-11 py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print progress summary</span>
@@ -139,7 +139,7 @@ export const RecordsTracker: React.FC = () => {
 
             <button
               onClick={() => setActiveNavTab('certificate')}
-              className={`py-2.5 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-xs ${
+              className={`min-h-11 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-xs ${
                 isEligibleForCert
                   ? 'bg-amber-700 hover:bg-amber-800 text-white'
                   : 'bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:opacity-90'
@@ -313,7 +313,7 @@ export const RecordsTracker: React.FC = () => {
           <div className="flex items-center gap-1.5 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl no-print text-xs">
             <button
               onClick={() => setFilter('all')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+              className={`min-h-10 px-3 py-2 rounded-lg font-semibold transition-colors ${
                 filter === 'all'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs'
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -323,7 +323,7 @@ export const RecordsTracker: React.FC = () => {
             </button>
             <button
               onClick={() => setFilter('completed')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+              className={`min-h-10 px-3 py-2 rounded-lg font-semibold transition-colors ${
                 filter === 'completed'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs'
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -333,7 +333,7 @@ export const RecordsTracker: React.FC = () => {
             </button>
             <button
               onClick={() => setFilter('pending')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+              className={`min-h-10 px-3 py-2 rounded-lg font-semibold transition-colors ${
                 filter === 'pending'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs'
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -345,7 +345,7 @@ export const RecordsTracker: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" role="region" aria-label="Scrollable lesson progress table" tabIndex={0}>
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-neutral-200 dark:border-neutral-800 text-neutral-400 uppercase text-[10px] tracking-wider font-bold">
@@ -418,7 +418,7 @@ export const RecordsTracker: React.FC = () => {
                       {isLocked ? (
                         <button
                           onClick={() => setShowPaywallModal(true)}
-                          className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-700 hover:bg-amber-800 text-white transition-colors"
+                          className="min-h-10 px-2.5 py-2 text-[11px] font-bold rounded-lg bg-amber-700 hover:bg-amber-800 text-white transition-colors"
                         >
                           View demo pricing
                         </button>
@@ -426,7 +426,7 @@ export const RecordsTracker: React.FC = () => {
                         <>
                           <button
                             onClick={() => toggleChapterComplete(ch.id)}
-                            className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-colors ${
+                            className={`min-h-10 px-2.5 py-2 text-[11px] font-semibold rounded-lg border transition-colors ${
                               completed
                                 ? 'border-neutral-200 text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700'
                                 : 'border-emerald-600 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30'
@@ -440,7 +440,7 @@ export const RecordsTracker: React.FC = () => {
                               setSelectedChapterId(ch.id);
                               setActiveNavTab('curriculum');
                             }}
-                            className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:opacity-90 transition-colors"
+                            className="min-h-10 px-2.5 py-2 text-[11px] font-bold rounded-lg bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:opacity-90 transition-colors"
                           >
                             Study
                           </button>

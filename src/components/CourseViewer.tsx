@@ -291,7 +291,7 @@ export const CourseViewer: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => toggleChapterComplete(currentChapter.id)}
-                className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border shadow-2xs ${
+                className={`min-h-11 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border shadow-2xs ${
                   isChapterCompleted(currentChapter.id)
                     ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                     : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700 hover:border-emerald-500'
@@ -307,7 +307,7 @@ export const CourseViewer: React.FC = () => {
 
               <button
                 onClick={() => setActiveNavTab('resources')}
-                className="px-2.5 py-1 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-amber-700 dark:hover:text-amber-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                className="min-h-11 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-amber-700 dark:hover:text-amber-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
               >
                 Glossary & Resources
               </button>
@@ -336,7 +336,7 @@ export const CourseViewer: React.FC = () => {
             <div className="flex flex-wrap gap-2 pt-5 border-t border-neutral-100 dark:border-neutral-800 mt-5">
               <button
                 onClick={() => setActiveTab('study')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`min-h-11 flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
                   activeTab === 'study'
                     ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
                     : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -348,7 +348,7 @@ export const CourseViewer: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('diagram')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`min-h-11 flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
                   activeTab === 'diagram'
                     ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
                     : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -361,7 +361,7 @@ export const CourseViewer: React.FC = () => {
               {currentChapter.caseStudy && (
                 <button
                   onClick={() => setActiveTab('casestudy')}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                  className={`min-h-11 flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
                     activeTab === 'casestudy'
                       ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
                       : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -374,7 +374,7 @@ export const CourseViewer: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('quiz')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`min-h-11 flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
                   activeTab === 'quiz'
                     ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
                     : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -386,7 +386,7 @@ export const CourseViewer: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('checklist')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`min-h-11 flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
                   activeTab === 'checklist'
                     ? 'bg-amber-600 text-white shadow-xs'
                     : 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/60'
@@ -400,21 +400,21 @@ export const CourseViewer: React.FC = () => {
         </div>
 
         {/* LOCKED CHAPTER PAYWALL OVERLAY */}
-        <nav aria-label="Lesson navigation" className="flex items-center justify-between gap-3">
+        <nav aria-label="Lesson navigation" className="flex items-center justify-between gap-2">
           <button
             type="button"
             disabled={!canOpenChapter(previousChapter)}
             onClick={() => previousChapter && setSelectedChapterId(previousChapter.id)}
-            className="min-h-10 rounded-xl border academy-line px-4 text-sm font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35]"
+            className="min-h-11 min-w-0 rounded-xl border academy-line px-3 text-center text-xs font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35] sm:px-4 sm:text-sm"
           >
             ← Previous lesson
           </button>
-          <span className="text-xs academy-muted">{selectedIndex + 1} of {allChapters.length}</span>
+          <span className="shrink-0 text-xs academy-muted">{selectedIndex + 1} of {allChapters.length}</span>
           <button
             type="button"
             disabled={!canOpenChapter(nextChapter)}
             onClick={() => nextChapter && setSelectedChapterId(nextChapter.id)}
-            className="min-h-10 rounded-xl border academy-line px-4 text-sm font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35]"
+            className="min-h-11 min-w-0 rounded-xl border academy-line px-3 text-center text-xs font-semibold transition hover:bg-[#e6f1ed] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-[#263a35] sm:px-4 sm:text-sm"
           >
             Next lesson →
           </button>
@@ -577,7 +577,8 @@ export const CourseViewer: React.FC = () => {
                 {(currentChapter.diagramType === 'corridor_flow' || currentChapter.moduleId === 'mod-3') && (
                   <div className="space-y-4">
                     <figure className="academy-route-visual p-3 sm:p-5" aria-labelledby="corridor-visual-caption">
-                      <svg viewBox="0 0 760 150" role="img" aria-labelledby="corridor-title corridor-desc" className="w-full h-auto">
+                      <div className="overflow-x-auto" role="region" aria-label="Scrollable corridor process diagram" tabIndex={0}>
+                      <svg viewBox="0 0 760 150" role="img" aria-labelledby="corridor-title corridor-desc" className="h-auto w-full min-w-[760px]">
                         <title id="corridor-title">Djibouti to Ethiopia import corridor</title>
                         <desc id="corridor-desc">Cargo moves from the Port of Djibouti through corridor trucking to Mojo or Indode dry port, then onward to delivery and assembly.</desc>
                         <path className="route-line" d="M80 58 H680" />
@@ -597,6 +598,7 @@ export const CourseViewer: React.FC = () => {
                         <text x="660" y="96" textAnchor="middle" className="route-label">Delivery</text>
                         <text x="660" y="114" textAnchor="middle" className="route-note">Warehouse · assembly</text>
                       </svg>
+                      </div>
                       <figcaption id="corridor-visual-caption" className="px-1 pt-2 text-[11px] academy-muted">
                         A practical sequence: port handling → transit → customs processing → inland delivery.
                       </figcaption>

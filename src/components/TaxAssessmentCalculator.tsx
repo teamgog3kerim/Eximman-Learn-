@@ -124,14 +124,14 @@ export const TaxAssessmentCalculator: React.FC = () => {
           </button>
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+            className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset</span>
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-white bg-neutral-900 hover:bg-black dark:bg-neutral-700 dark:hover:bg-neutral-600 rounded-lg shadow-sm transition-colors"
+            className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-xs font-medium text-white bg-neutral-900 hover:bg-black dark:bg-neutral-700 dark:hover:bg-neutral-600 rounded-lg shadow-sm transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print</span>
@@ -217,14 +217,14 @@ export const TaxAssessmentCalculator: React.FC = () => {
         </div>
 
         {/* Total CIF Value Banner */}
-        <div className="bg-neutral-50 dark:bg-neutral-800/60 p-4 rounded-xl flex items-center justify-between border border-neutral-100 dark:border-neutral-800">
+        <div className="bg-neutral-50 dark:bg-neutral-800/60 p-4 rounded-xl flex flex-col items-start gap-2 border border-neutral-100 dark:border-neutral-800 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
               TOTAL CIF VALUE
             </span>
             <div className="text-[11px] text-neutral-400">FOB ETB + Freight ETB + Insurance ETB</div>
           </div>
-          <div className="text-xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-100">
+          <div className="break-all text-lg font-bold font-mono-numbers text-neutral-900 dark:text-neutral-100 sm:text-xl">
             ETB {formatETB(totalCifETB)}
           </div>
         </div>
@@ -246,14 +246,14 @@ export const TaxAssessmentCalculator: React.FC = () => {
         </div>
 
         {/* Total Taxable Amount Banner */}
-        <div className="bg-neutral-900 dark:bg-neutral-950 text-white p-4 rounded-xl flex items-center justify-between shadow-sm">
+        <div className="bg-neutral-900 dark:bg-neutral-950 text-white p-4 rounded-xl flex flex-col items-start gap-2 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
               TOTAL TAXABLE AMOUNT
             </span>
             <div className="text-[11px] text-neutral-400">CIF + Other Inland Costs — base for all item taxes</div>
           </div>
-          <div className="text-xl md:text-2xl font-bold font-mono-numbers text-white">
+          <div className="break-all text-lg font-bold font-mono-numbers text-white md:text-2xl">
             ETB {formatETB(totalTaxableAmountETB)}
           </div>
         </div>
@@ -265,7 +265,7 @@ export const TaxAssessmentCalculator: React.FC = () => {
           <span>Item Taxes</span>
         </h2>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" role="region" aria-label="Scrollable customs tax rates table" tabIndex={0}>
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 pb-2">
@@ -402,7 +402,7 @@ export const TaxAssessmentCalculator: React.FC = () => {
         </div>
 
         {/* Total Item Taxes */}
-        <div className="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-800 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800 text-xs">
           <span className="font-semibold text-neutral-600 dark:text-neutral-400">TOTAL ITEM TAXES</span>
           <span className="font-bold font-mono-numbers text-neutral-900 dark:text-neutral-100 text-sm">
             ETB {formatETB(totalItemTaxesETB)}
@@ -411,20 +411,20 @@ export const TaxAssessmentCalculator: React.FC = () => {
 
         {/* Black & Brown Summary Cards (Exact UI match to Screenshot 3) */}
         <div className="space-y-2 pt-2">
-          <div className="bg-neutral-900 text-white p-4 rounded-xl flex items-center justify-between">
+          <div className="bg-neutral-900 text-white p-4 rounded-xl flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-300">
               TOTAL TAX ASSESSED AMOUNT
             </span>
-            <span className="text-xl md:text-2xl font-bold font-mono-numbers text-white">
+            <span className="break-all text-lg font-bold font-mono-numbers text-white md:text-2xl">
               ETB {formatETB(totalAssessedAmountETB)}
             </span>
           </div>
 
-          <div className="bg-amber-900/90 text-white p-4 rounded-xl flex items-center justify-between">
+          <div className="bg-amber-900/90 text-white p-4 rounded-xl flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-200">
               TAX ASSESSED PER UNIT ({units} {units === 1 ? 'UNIT' : 'UNITS'})
             </span>
-            <span className="text-xl md:text-2xl font-bold font-mono-numbers text-amber-100">
+            <span className="break-all text-lg font-bold font-mono-numbers text-amber-100 md:text-2xl">
               ETB {formatETB(taxPerUnitETB)}
             </span>
           </div>
@@ -433,7 +433,7 @@ export const TaxAssessmentCalculator: React.FC = () => {
 
       {/* Assessment Notice Preview (Matches Screenshot 3 bottom view) */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-neutral-200 dark:border-neutral-800 pb-3">
           <h2 className="text-base font-serif-title font-bold text-neutral-900 dark:text-neutral-100">
             Assessment Notice Preview
           </h2>

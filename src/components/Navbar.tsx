@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
         onClick={() => navigate(item.id)}
         aria-current={active ? 'page' : undefined}
         className={`group flex items-center gap-2 rounded-lg text-left transition-colors ${
-          mobile ? 'w-full px-3 py-2.5 text-sm' : 'whitespace-nowrap px-2.5 py-2 text-[11px]'
+          mobile ? 'min-h-11 w-full px-3 py-2.5 text-sm' : 'whitespace-nowrap px-2.5 py-2 text-[11px]'
         } ${active ? 'bg-[#e6f1ed] font-bold text-[#145c52] dark:bg-[#263a35] dark:text-[#b5dfd2]' : 'font-semibold text-[#596760] hover:bg-[#eef1ec] hover:text-[#202b29] dark:text-[#b1bdb5] dark:hover:bg-[#26312d] dark:hover:text-white'}`}
       >
         <Icon className={`${mobile ? 'h-4 w-4' : 'h-3.5 w-3.5'} shrink-0 ${active ? 'text-[#176b60] dark:text-[#8bc9b8]' : ''}`} />

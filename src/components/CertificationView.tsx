@@ -85,7 +85,7 @@ export const CertificationView: React.FC = () => {
             <button
               onClick={handleCopyVerification}
               disabled={!currentUser.certificateIssuedAt}
-              className="py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              className="min-h-11 py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>{currentUser.certificateIssuedAt ? 'Copy certificate ID' : 'No certificate issued'}</span>
@@ -94,7 +94,7 @@ export const CertificationView: React.FC = () => {
             <button
               onClick={handleCopyVerification}
               disabled={!currentUser.certificateIssuedAt}
-              className="py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              className="min-h-11 py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
               <span>{copiedLink ? 'ID copied' : 'Copy certificate ID'}</span>
@@ -103,7 +103,7 @@ export const CertificationView: React.FC = () => {
             <button
               onClick={handlePrint}
               disabled={!currentUser.certificateIssuedAt}
-              className="py-2.5 px-5 text-xs font-bold rounded-xl bg-amber-700 hover:bg-amber-800 text-white transition-colors flex items-center gap-1.5 shadow-xs"
+              className="min-h-11 py-2.5 px-5 text-xs font-bold rounded-xl bg-amber-700 hover:bg-amber-800 text-white transition-colors flex items-center gap-1.5 shadow-xs"
             >
               <Printer className="w-4 h-4" />
                 <span>Print course record</span>
@@ -148,29 +148,29 @@ export const CertificationView: React.FC = () => {
         )}
 
         {/* Name Customization */}
-        <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800 text-xs">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800 text-xs">
           <span className="text-neutral-500 font-medium">Recipient Name on Diploma:</span>
           {isEditingName ? (
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
               <input
                 type="text"
                 value={studentName}
                 onChange={e => setStudentName(e.target.value)}
-                className="px-2.5 py-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-xs font-bold"
+                className="min-w-0 flex-1 px-2.5 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-xs font-bold sm:w-56 sm:flex-initial"
               />
               <button
                 onClick={() => setIsEditingName(false)}
-                className="px-2 py-1 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-md font-bold text-[11px]"
+                className="min-h-10 shrink-0 px-3 py-1 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-md font-bold text-[11px]"
               >
                 Save
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="font-bold text-neutral-900 dark:text-neutral-100">{studentName}</span>
+              <span className="break-words font-bold text-neutral-900 dark:text-neutral-100">{studentName}</span>
               <button
                 onClick={() => setIsEditingName(true)}
-                className="text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
+                className="min-h-10 px-2 text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
               >
                 <Edit3 className="w-3 h-3" /> Edit
               </button>

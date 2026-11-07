@@ -84,7 +84,7 @@ export const QuizCenter: React.FC = () => {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           onClick={() => setSelectedModuleId('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`min-h-10 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
             selectedModuleId === 'all'
               ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
               : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -96,7 +96,7 @@ export const QuizCenter: React.FC = () => {
           <button
             key={m.id}
             onClick={() => setSelectedModuleId(m.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`min-h-10 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
               selectedModuleId === m.id
                 ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
                 : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
@@ -135,7 +135,7 @@ export const QuizCenter: React.FC = () => {
                     setSelectedChapterId(chapter.id);
                     setActiveNavTab('curriculum');
                   }}
-                  className="text-xs text-amber-700 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1"
+                  className="min-h-10 rounded-lg px-2 text-xs text-amber-700 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1"
                 >
                   <span>Go to Study Notes</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export const QuizCenter: React.FC = () => {
                 </p>
                 <button
                   onClick={() => setShowPaywallModal(true)}
-                  className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold"
+                  className="min-h-11 px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold"
                 >
                   View demo pricing information
                 </button>
@@ -196,7 +196,7 @@ export const QuizCenter: React.FC = () => {
                               disabled={isChecked}
                               aria-pressed={selectedOpt === optIdx}
                               onClick={() => handleSelectOption(q.id, optIdx)}
-                              className={`w-full p-2.5 rounded-lg border text-left transition-colors flex items-center justify-between ${optStyle}`}
+                              className={`min-h-11 w-full p-3 rounded-lg border text-left transition-colors flex items-center justify-between gap-3 ${optStyle}`}
                             >
                               <span>{opt}</span>
                               {isChecked && optIdx === q.correctIndex && (
@@ -212,7 +212,7 @@ export const QuizCenter: React.FC = () => {
                           <button
                             onClick={() => handleCheckQuestion(q.id, chapter.id, chapter.quiz.map(question => question.id))}
                             disabled={selectedOpt === undefined}
-                            className="px-3 py-1.5 bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 text-white rounded-lg text-[11px] font-bold disabled:opacity-40"
+                            className="min-h-10 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 text-white rounded-lg text-[11px] font-bold disabled:opacity-40"
                           >
                             Verify Answer
                           </button>
@@ -242,7 +242,7 @@ export const QuizCenter: React.FC = () => {
                     {quizScores[chapter.id].score / quizScores[chapter.id].maxScore >= 0.6
                       ? ' The lesson is marked complete.'
                       : ' Review the lesson, then try again.'}
-                    <button type="button" onClick={() => handleRetake(chapter.quiz.map(question => question.id))} className="ml-3 font-bold underline">Retake this quiz</button>
+                    <button type="button" onClick={() => handleRetake(chapter.quiz.map(question => question.id))} className="mt-2 min-h-10 rounded-lg px-2 font-bold underline sm:ml-3 sm:mt-0">Retake this quiz</button>
                   </div>
                 )}
               </div>

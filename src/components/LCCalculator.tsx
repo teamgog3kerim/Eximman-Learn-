@@ -143,7 +143,7 @@ export const LCCalculator: React.FC = () => {
     <div className="academy-workspace space-y-6">
       <AcademyWorkspaceSkin />
       {/* Header banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
+      <div className="flex flex-col gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
             <span>Commercial Bank of Ethiopia / Private Banks Standard</span>
@@ -163,7 +163,7 @@ export const LCCalculator: React.FC = () => {
             type="button"
             onClick={() => setActiveNavTab('overview')}
             aria-label="Back to overview"
-            className="inline-flex min-h-10 items-center gap-1.5 self-start rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to overview</span>
