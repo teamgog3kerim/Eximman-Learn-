@@ -119,8 +119,6 @@ const MainContent: React.FC = () => {
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 academy-muted">
             <span>Business pricing: 3,900 ETB / 30 days</span>
-            <span className="hidden sm:inline">·</span>
-            <span>Local demo only · no payments verified</span>
           </div>
         </div>
       </footer>
