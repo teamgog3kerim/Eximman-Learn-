@@ -15,8 +15,8 @@ In a later deployment attempt, `npm ci` still exited with npm's generic “Exit 
 
 **How to apply:** If this pattern recurs, stop changing the dependency tree and obtain the build container's npm debug log or provider-side timeout/resource information.
 
-As an alternate workaround, a Nixpacks install-phase override using `npm install --no-audit --no-fund --package-lock=true` passed a fresh local install with the same Node/npm versions. Its success on EthioDeploy remains unverified until a new remote build runs.
+The repository's valid `nixpacks.toml` install override was present in the exact commit cloned by EthioDeploy, but Nixpacks 1.41 still generated `npm ci`. The remote builder therefore ignored or superseded the file configuration.
 
-**Why:** This preserves the checked-in lockfile while avoiding the failing `npm ci` command; it is a diagnostic workaround, not proof of the provider-side cause.
+**Why:** Local configuration alone did not change the remote build plan, so another commit with the same TOML would not address the failure.
 
-**How to apply:** Use this override only after verifying the exact generated Nixpacks phase and the resulting remote build; keep security auditing as a separate check.
+**How to apply:** Set the build-time `NIXPACKS_INSTALL_CMD` override (or the provider's equivalent) to `npm install --no-audit --no-fund --package-lock=true`, then verify the generated plan says `npm install` before retrying. Keep security auditing as a separate check.
