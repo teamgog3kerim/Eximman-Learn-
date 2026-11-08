@@ -3,6 +3,8 @@ import cors from 'cors';
 import multer from 'multer';
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
+import { readdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { createClerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { publishableKeyFromHost } from '@clerk/shared/keys';
 import { clerkProxyMiddleware, CLERK_PROXY_PATH, getClerkProxyHost } from './middlewares/clerkProxyMiddleware';
@@ -18,6 +20,30 @@ const SUBSCRIPTION_PRICE_ETB = 3900;
 const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 const COURSE_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
 const COURSE_CHAPTERS_BY_ID = new Map(COURSE_CHAPTERS.map(chapter => [chapter.id, chapter]));
+
+app.get('/healthz', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok' });
+  } catch {
+    res.status(503).json({ status: 'unavailable' });
+  }
+});
+
+async function runMigrations() {
+  const migrationsDirectory = path.resolve(import.meta.dirname, 'migrations');
+  const migrations = (await readdir(migrationsDirectory))
+    .filter(file => /^\d+.*\.sql$/.test(file))
+    .sort();
+  if (!migrations.length) throw new Error(`No SQL migrations found in ${migrationsDirectory}`);
+
+  for (const file of migrations) {
+    const sql = await readFile(path.join(migrationsDirectory, file), 'utf8');
+    await pool.query(sql);
+    console.log(`Applied database migration ${file}`);
+  }
+}
+
 const asyncRoute = (
   handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
 ): RequestHandler => (req, res, next) => {
@@ -439,10 +465,11 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 async function start() {
-  if (!process.env.DATABASE_URL || !process.env.CLERK_SECRET_KEY) {
-    throw new Error('Database and authentication setup are required to start the academy.');
+  if (!process.env.DATABASE_URL || !process.env.CLERK_SECRET_KEY || !process.env.CLERK_PUBLISHABLE_KEY) {
+    throw new Error('DATABASE_URL, CLERK_SECRET_KEY, and CLERK_PUBLISHABLE_KEY are required to start the academy.');
   }
   await pool.query('SELECT 1');
+  await runMigrations();
   if (process.env.NODE_ENV !== 'production') {
     const { createServer } = await import('vite');
     const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
