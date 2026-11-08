@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from '@clerk/react';
 import { AppProvider, useApp } from './context/AppContext';
+import { useLanguage } from './context/LanguageContext';
 import { PublicLanding } from './components/PublicLanding';
 import { Navbar } from './components/Navbar';
 import { LearningDashboard } from './components/LearningDashboard';
@@ -19,11 +20,12 @@ import { ResourceLibrary } from './components/ResourceLibrary';
 import { RecordsTracker } from './components/RecordsTracker';
 import { CertificationView } from './components/CertificationView';
 import { SubscriptionModal } from './components/SubscriptionModal';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info, Send } from 'lucide-react';
 
 const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
 const MainContent: React.FC = () => {
+  const { t } = useLanguage();
   const {
     activeNavTab, isAdmin, hasFullAccess, hasTrialAccess, trialDaysRemaining,
     showPaywallModal, setShowPaywallModal, progressSaveError,
@@ -117,8 +119,20 @@ const MainContent: React.FC = () => {
             <p className="font-serif-title text-sm font-extrabold">Ethio Export-Import and Logistics Learning Academy</p>
             <p className="mt-1 academy-muted">A practical learning workspace for trade and logistics professionals.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 academy-muted">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 academy-muted">
             <span>Business pricing: 3,900 ETB / 30 days</span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <a
+                href="https://t.me/eximmanlearn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-9 items-center gap-2 rounded-full bg-[#1d5f52] px-3.5 text-[11px] font-bold text-white transition hover:bg-[#153f39] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d5f52]"
+              >
+                <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                {t('Join our channel')}
+              </a>
+              <span className="max-w-[300px] text-[10px] leading-4">{t('Business news, announcements, help and support from our team, and more.')}</span>
+            </div>
           </div>
         </div>
       </footer>

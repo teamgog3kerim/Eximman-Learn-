@@ -318,6 +318,8 @@ const AMHARIC_UI: Record<string, string> = {
   'Ethiopian Single Window (trade.esw.et) e-SAD Declarations': 'የኢትዮጵያ አንድ መስኮት (trade.esw.et) የe-SAD መግለጫዎች',
   'Letter of Credit (LC) Margins, Commissions & Settlement': 'የክሬዲት ደብዳቤ (LC) ማርጂን፣ ኮሚሽን እና ክፍያ ማስተካከያ',
   'Djibouti & Regional Corridors, Demurrage & Dry Ports': 'የጅቡቲ እና የክልል ኮሪደሮች፣ የዘግይቶ ቆይታ ክፍያ እና ደረቅ ወደቦች',
+  'Join our channel': 'የቴሌግራም ቻናላችንን ይቀላቀሉ',
+  'Business news, announcements, help and support from our team, and more.': 'የንግድ ዜናዎች፣ ማስታወቂያዎች፣ ከቡድናችን እገዛና ድጋፍ እና ሌሎችም።',
 };
 
 type LanguageContextValue = {
