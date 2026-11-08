@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useLocalizedCourseModules } from '../context/LanguageContext';
+import { useLanguage, useLocalizedCourseModules } from '../context/LanguageContext';
 import {
   Award,
   CheckCircle2,
@@ -24,6 +24,7 @@ import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const CertificationView: React.FC = () => {
   const COURSE_MODULES = useLocalizedCourseModules();
+  const { language, t } = useLanguage();
   const {
     currentUser,
     completedChaptersCount,
@@ -71,13 +72,13 @@ export const CertificationView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1">
               <Award className="w-4 h-4" />
-              <span>Demo course-completion record</span>
+               <span>{t('Demo course-completion record')}</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50">
-              Executive Certification in Ethiopian Foreign Trade
+              {t('Executive Certification in Ethiopian Foreign Trade')}
             </h1>
             <p className="text-xs text-neutral-500 mt-1">
-              Progress is saved to your account. This is not an accredited qualification or independently verifiable credential.
+               {t('Progress is saved to your account. This is not an accredited qualification or independently verifiable credential.')}
             </p>
           </div>
 
@@ -89,7 +90,7 @@ export const CertificationView: React.FC = () => {
               className="min-h-11 py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>{currentUser.certificateIssuedAt ? 'Copy certificate ID' : 'No certificate issued'}</span>
+               <span>{t(currentUser.certificateIssuedAt ? 'Copy certificate ID' : 'No certificate issued')}</span>
             </button>
 
             <button
@@ -98,7 +99,7 @@ export const CertificationView: React.FC = () => {
               className="min-h-11 py-2.5 px-4 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
             >
               {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
-              <span>{copiedLink ? 'ID copied' : 'Copy certificate ID'}</span>
+               <span>{t(copiedLink ? 'ID copied' : 'Copy certificate ID')}</span>
             </button>
 
             <button
@@ -107,7 +108,7 @@ export const CertificationView: React.FC = () => {
               className="min-h-11 py-2.5 px-5 text-xs font-bold rounded-xl bg-amber-700 hover:bg-amber-800 text-white transition-colors flex items-center gap-1.5 shadow-xs"
             >
               <Printer className="w-4 h-4" />
-                <span>Print course record</span>
+                 <span>{t('Print course record')}</span>
             </button>
           </div>
         </div>
@@ -118,10 +119,10 @@ export const CertificationView: React.FC = () => {
             <div className="space-y-1">
               <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>Course progress: {completedChaptersCount} of {COURSE_MODULES.flatMap(module => module.chapters).length} lessons completed</span>
+                 <span>{language === 'am' ? `የኮርስ እድገት፦ ${completedChaptersCount} ከ${COURSE_MODULES.flatMap(module => module.chapters).length} ትምህርቶች ተጠናቀዋል` : `Course progress: ${completedChaptersCount} of ${COURSE_MODULES.flatMap(module => module.chapters).length} lessons completed`}</span>
               </div>
               <p className="text-amber-800/90 dark:text-amber-300/80">
-                This print preview is for demonstration only. Complete all course lessons to enable an account-saved course record.
+                {t('This print preview is for demonstration only. Complete all course lessons to enable an account-saved course record.')}
               </p>
             </div>
 
@@ -130,7 +131,7 @@ export const CertificationView: React.FC = () => {
                 onClick={() => setActiveNavTab('progress')}
                 className="py-2 px-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 font-semibold rounded-lg text-[11px]"
               >
-                Go to Tracker
+                {t('Go to Tracker')}
               </button>
             </div>
           </div>
@@ -138,19 +139,19 @@ export const CertificationView: React.FC = () => {
           <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-900 dark:text-emerald-200">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
-              <span className="font-bold">Course complete.</span> Your progress record is saved to your account. It is not an accredited certificate and has no online verification.
+              <span className="font-bold">{t('Course complete.')}</span> {t('Your progress record is saved to your account. It is not an accredited certificate and has no online verification.')}
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 sm:flex-row sm:items-center sm:justify-between">
-            <p><strong>All lessons completed.</strong> You can generate an account-saved course-completion record. It is not an accredited credential.</p>
-            <button type="button" onClick={issueCertificate} className="shrink-0 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white hover:bg-emerald-900 dark:bg-emerald-200 dark:text-emerald-950">Generate course record</button>
+            <p><strong>{t('All lessons completed.')}</strong> {t('You can generate an account-saved course-completion record. It is not an accredited credential.')}</p>
+               <button type="button" onClick={issueCertificate} className="shrink-0 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white hover:bg-emerald-900 dark:bg-emerald-200 dark:text-emerald-950">{t('Generate course record')}</button>
           </div>
         )}
 
         {/* Name Customization */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800 text-xs">
-          <span className="text-neutral-500 font-medium">Recipient Name on Diploma:</span>
+           <span className="text-neutral-500 font-medium">{t('Recipient Name on Diploma:')}</span>
           {isEditingName ? (
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
               <input
@@ -163,7 +164,7 @@ export const CertificationView: React.FC = () => {
                 onClick={() => setIsEditingName(false)}
                 className="min-h-10 shrink-0 px-3 py-1 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-md font-bold text-[11px]"
               >
-                Save
+                 {t('Save')}
               </button>
             </div>
           ) : (
@@ -173,7 +174,7 @@ export const CertificationView: React.FC = () => {
                 onClick={() => setIsEditingName(true)}
                 className="min-h-10 px-2 text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
               >
-                <Edit3 className="w-3 h-3" /> Edit
+                 <Edit3 className="w-3 h-3" /> {t('Edit')}
               </button>
             </div>
           )}
@@ -202,22 +203,22 @@ export const CertificationView: React.FC = () => {
             </div>
 
             <div className="text-[11px] font-sans font-bold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-400 mt-2">
-              DEMONSTRATION · BROWSER-STORED RECORD
+              {t('DEMONSTRATION · BROWSER-STORED RECORD')}
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl font-serif-title font-bold tracking-wider text-amber-900 dark:text-amber-400 uppercase">
-              Ethiopia Import, Export & Logistics Academy
+              {t('Ethiopia Import, Export & Logistics Academy')}
             </h2>
 
             <div className="text-[10px] sm:text-xs font-sans uppercase tracking-[0.2em] text-neutral-600 dark:text-neutral-400 font-semibold">
-              Center for Continuing Trade Finance, Customs Valuation & Corridor Logistics Mastery
+              {t('Center for Continuing Trade Finance, Customs Valuation & Corridor Logistics Mastery')}
             </div>
           </div>
 
           {/* Main Statement */}
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-4">
             <div className="text-xs sm:text-sm uppercase tracking-widest font-sans text-neutral-400 dark:text-neutral-500 font-semibold">
-              This is to certify that
+              {t('This is to certify that')}
             </div>
 
             <div className="text-3xl sm:text-4xl md:text-5xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 tracking-tight border-b-2 border-amber-700/30 pb-3 inline-block px-6">
@@ -225,12 +226,12 @@ export const CertificationView: React.FC = () => {
             </div>
 
             <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-sans pt-2">
-              has satisfactorily completed the rigorous professional training curriculum, real-world case studies, and advanced financial modeling examinations to earn the credential of:
+              {t('has satisfactorily completed the rigorous professional training curriculum, real-world case studies, and advanced financial modeling examinations to earn the credential of:')}
             </p>
 
             <div className="bg-amber-100/70 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 rounded-xl p-4 my-3">
               <h3 className="text-lg sm:text-xl md:text-2xl font-serif-title font-bold text-amber-950 dark:text-amber-200">
-              Course Completion · Ethiopian Import, Export & Logistics
+              {t('Course Completion · Ethiopian Import, Export & Logistics')}
               </h3>
             </div>
           </div>
@@ -238,24 +239,24 @@ export const CertificationView: React.FC = () => {
           {/* Competency Syllabus Summary */}
           <div className="max-w-3xl mx-auto pt-2">
             <div className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 text-center mb-2">
-              Topics covered in the curriculum:
+              {t('Topics covered in the curriculum:')}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-neutral-600 dark:text-neutral-400 font-sans">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                <span>NBE Forex Directives & Market-Determined Hedging</span>
+                <span>{t('NBE Forex Directives & Market-Determined Hedging')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                <span>Ethiopian Single Window (trade.esw.et) e-SAD Declarations</span>
+                <span>{t('Ethiopian Single Window (trade.esw.et) e-SAD Declarations')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                <span>Letter of Credit (LC) Margins, Commissions & Settlement</span>
+                <span>{t('Letter of Credit (LC) Margins, Commissions & Settlement')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                <span>Djibouti & Regional Corridors, Demurrage & Dry Ports</span>
+                <span>{t('Djibouti & Regional Corridors, Demurrage & Dry Ports')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />

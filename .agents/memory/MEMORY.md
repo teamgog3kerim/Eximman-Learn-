@@ -1,1 +1,2 @@
 - [Academy scope](academy-scope.md) — Preserve learning features and carry the approved public-page visual theme into authenticated screens.
+- [Translation quality checks](translation-quality.md) — Scan generated Amharic for accidental writing-system contamination; only claim native review when one occurred.

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useLocalizedCourseModules } from '../context/LanguageContext';
+import { useLanguage, useLocalizedCourseModules } from '../context/LanguageContext';
 import {
   CheckCircle2,
   Clock,
@@ -23,6 +23,7 @@ import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const RecordsTracker: React.FC = () => {
   const COURSE_MODULES = useLocalizedCourseModules();
+  const { language, t } = useLanguage();
   const {
     currentUser,
     hasFullAccess,
@@ -80,7 +81,7 @@ export const RecordsTracker: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
               <FileCheck className="w-4 h-4" />
-              <span>Account-synced learning progress</span>
+              <span>{t('Account-synced learning progress')}</span>
             </div>
 
             <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
@@ -90,14 +91,14 @@ export const RecordsTracker: React.FC = () => {
             <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="break-all">{currentUser.email || 'No email saved'}</span>
+                <span className="break-all">{currentUser.email || t('No email saved')}</span>
               </span>
               <span>·</span>
               {currentUser.phoneNumber && <span>Mobile: {currentUser.phoneNumber}</span>}
               <span>·</span>
-              <span className="flex items-center gap-1.5">
+               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-neutral-400" />
-                <span>Enrolled: {new Date(currentUser.registeredAt).toLocaleDateString()}</span>
+                 <span>{t('Enrolled')}: {new Date(currentUser.registeredAt).toLocaleDateString()}</span>
               </span>
             </div>
 
@@ -112,17 +113,17 @@ export const RecordsTracker: React.FC = () => {
                   : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
               }`}>
                 {currentUser.role === 'admin'
-                  ? 'Program Administrator'
+                  ? t('Program Administrator')
                   : currentUser.subscriptionStatus === 'active_paid'
-                  ? 'Paid 30-Day Subscription (Active)'
+                  ? t('Paid 30-Day Subscription (Active)')
                   : currentUser.subscriptionStatus === 'pending_approval'
-                  ? 'Payment Pending Approval (3,900 ETB)'
-                  : 'Free Trial (Module 1, Ch 1 & 2)'}
+                  ? t('Payment Pending Approval (3,900 ETB)')
+                  : t('Free Trial (Module 1, Ch 1 & 2)')}
               </span>
 
               {currentUser.expiresAt && (
                 <span className="text-xs text-neutral-500 font-mono">
-                  Valid until: {new Date(currentUser.expiresAt).toLocaleDateString()}
+                  {t('Valid until')}: {new Date(currentUser.expiresAt).toLocaleDateString()}
                 </span>
               )}
             </div>
@@ -135,7 +136,7 @@ export const RecordsTracker: React.FC = () => {
               className="min-h-11 py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print progress summary</span>
+               <span>{t('Print progress summary')}</span>
             </button>
 
             <button
@@ -147,7 +148,7 @@ export const RecordsTracker: React.FC = () => {
               }`}
             >
               <Award className="w-4 h-4 text-amber-300" />
-              <span>{isEligibleForCert ? 'View Executive Certificate' : 'Certificate Status'}</span>
+               <span>{t(isEligibleForCert ? 'View Executive Certificate' : 'Certificate Status')}</span>
             </button>
           </div>
         </div>
@@ -157,10 +158,10 @@ export const RecordsTracker: React.FC = () => {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
-                Academy Course Progress
+                 {t('Academy Course Progress')}
               </span>
               <span className="text-xs font-mono text-neutral-400">
-                ({completedChaptersCount} of 16 Chapters Completed)
+                {language === 'am' ? `(${completedChaptersCount} ከ16 ምዕራፎች ተጠናቋል)` : `(${completedChaptersCount} of 16 Chapters Completed)`}
               </span>
             </div>
             <span className="text-sm font-bold font-mono text-amber-700 dark:text-amber-400">
@@ -181,27 +182,27 @@ export const RecordsTracker: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-xs">
           <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Chapters Finished</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('Chapters Finished')}</span>
             <BookOpen className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100 mt-2">
             {completedChaptersCount} <span className="text-xs text-neutral-400 font-sans">/ 16</span>
           </div>
           <p className="text-[11px] text-neutral-500 mt-1">
-            {16 - completedChaptersCount} remaining to graduate
+            {16 - completedChaptersCount} {t('remaining to graduate')}
           </p>
         </div>
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-xs">
           <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Quizzes Passed</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('Quizzes Passed')}</span>
             <Sparkles className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100 mt-2">
-            {quizAttemptedCount} <span className="text-xs text-neutral-400 font-sans">tests</span>
+            {quizAttemptedCount} <span className="text-xs text-neutral-400 font-sans">{t('tests')}</span>
           </div>
           <p className="text-[11px] text-neutral-500 mt-1">
-            Avg mastery score: {averageQuizPct}%
+            {t('Avg mastery score:')} {averageQuizPct}%
           </p>
         </div>
 
@@ -214,7 +215,7 @@ export const RecordsTracker: React.FC = () => {
             3 <span className="text-xs text-neutral-400 font-sans">Calculators</span>
           </div>
           <p className="text-[11px] text-neutral-500 mt-1">
-            Landed Cost, LC Debits & Customs Tax
+            {t('Landed Cost, LC Debits & Customs Tax')}
           </p>
         </div>
 
@@ -226,16 +227,16 @@ export const RecordsTracker: React.FC = () => {
           <div className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-2 flex items-center gap-1.5">
             {isEligibleForCert ? (
               <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4" /> Qualified for Issue
+                 <CheckCircle2 className="w-4 h-4" /> {t('Qualified for Issue')}
               </span>
             ) : (
               <span className="text-amber-600 dark:text-amber-400">
-                {allChapters.length - completedChaptersCount} lessons left
+                {allChapters.length - completedChaptersCount} {t('lessons left')}
               </span>
             )}
           </div>
           <p className="text-[11px] text-neutral-500 mt-1">
-            Local course-completion record · not a verified qualification
+            {t('Local course-completion record · not a verified qualification')}
           </p>
         </div>
       </div>
@@ -243,7 +244,7 @@ export const RecordsTracker: React.FC = () => {
       {/* Module Breakdown Cards */}
       <div className="space-y-3">
         <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-500">
-          Curriculum Module Breakdown
+          {t('Curriculum Module Breakdown')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -259,7 +260,7 @@ export const RecordsTracker: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                    Module {mod.moduleNumber}
+                    {t('Module')} {mod.moduleNumber}
                   </span>
                   <span className="text-xs font-mono font-bold text-neutral-700 dark:text-neutral-300">
                     {modDone}/{modTotal} ({modPct}%)

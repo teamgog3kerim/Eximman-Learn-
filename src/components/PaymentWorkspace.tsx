@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 
 type RequestRow = {
   id: string; learner_email?: string; amount_etb: number; transaction_reference: string;
@@ -14,6 +15,7 @@ const buttonClass = 'inline-flex min-h-10 items-center justify-center rounded-xl
 
 export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode = false }) => {
   const { currentUser } = useApp();
+  const { t } = useLanguage();
   const [account, setAccount] = useState({ telebirrAccountName: '', telebirrAccountNumber: '', cbeAccountNumber: '' });
   const [requests, setRequests] = useState<RequestRow[]>([]);
   const [users, setUsers] = useState<{ id: string; email: string; name: string; role: string; subscriptionStatus: string; expiresAt?: string }[]>([]);
@@ -146,16 +148,16 @@ export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode 
 
   return (
     <section className="mx-auto max-w-4xl space-y-6">
-      <header><p className="text-xs font-bold uppercase tracking-[.16em] academy-brand">Learner account</p><h1 className="mt-1 font-serif-title text-3xl font-bold">Subscription & payment</h1><p className="mt-2 text-sm academy-muted">30 days of full course access · 3,900 ETB · verified manually by the academy admin.</p></header>
+        <header><p className="text-xs font-bold uppercase tracking-[.16em] academy-brand">{t('Learner account')}</p><h1 className="mt-1 font-serif-title text-3xl font-bold">{t('Subscription & payment')}</h1><p className="mt-2 text-sm academy-muted">{t('30 days of full course access · 3,900 ETB · verified manually by the academy admin.')}</p></header>
       {currentUser.expiresAt && <p className="rounded-xl bg-green-50 p-3 text-sm text-green-900">Your subscription expires {new Date(currentUser.expiresAt).toLocaleDateString()}.</p>}
       {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       {message && <p role="status" className="rounded-xl bg-green-50 p-3 text-sm text-green-900">{message}</p>}
       <div className="academy-card space-y-5 p-5 sm:p-7">
-        <div><h2 className="font-serif-title text-xl font-bold">1. Choose how to pay</h2><p className="mt-1 text-sm academy-muted">Send exactly 3,900 ETB, then submit the transaction reference. The admin will verify it and approve 30 days of access.</p></div>
-        <label className="block text-xs font-bold">Payment method
+        <div><h2 className="font-serif-title text-xl font-bold">{t('1. Choose how to pay')}</h2><p className="mt-1 text-sm academy-muted">{t('Send exactly 3,900 ETB, then submit the transaction reference. The admin will verify it and approve 30 days of access.')}</p></div>
+        <label className="block text-xs font-bold">{t('Payment method')}
           <select className={`${fieldClass} mt-1.5`} value={paymentMethod} onChange={event => setPaymentMethod(event.target.value as 'telebirr' | 'cbe')}>
             <option value="telebirr">Telebirr</option>
-            <option value="cbe">Commercial Bank of Ethiopia (CBE)</option>
+            <option value="cbe">{t('Commercial Bank of Ethiopia (CBE)')}</option>
           </select>
         </label>
         {paymentMethod === 'cbe'
@@ -163,14 +165,14 @@ export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode 
           : account.telebirrAccountNumber
             ? <dl className="rounded-xl bg-[#e6f1ed] p-4 text-sm dark:bg-[#263a35]"><div className="flex items-center justify-between gap-3"><div className="min-w-0"><dt className="text-xs academy-muted">Telebirr number</dt><dd className="mt-1 break-all font-bold">{account.telebirrAccountNumber}</dd></div><button type="button" onClick={() => void copyAccountNumber('telebirr', account.telebirrAccountNumber)} aria-label={copiedAccount === 'telebirr' ? 'Telebirr number copied' : 'Copy Telebirr number'} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border academy-line px-3 text-xs font-bold transition hover:bg-white/70 dark:hover:bg-white/10">{copiedAccount === 'telebirr' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}<span>{copiedAccount === 'telebirr' ? 'Copied' : 'Copy'}</span></button></div></dl>
             : <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">The admin has not set the Telebirr recipient yet. Choose CBE or check back later.</p>}
-        <form onSubmit={submit} className="space-y-4">
-          <div><h2 className="font-serif-title text-xl font-bold">2. Submit the transaction reference</h2><p className="mt-1 text-sm academy-muted">Enter the reference from your Telebirr or CBE payment confirmation. No screenshot is needed.</p></div>
-          <label className="block text-xs font-bold">Transaction reference<input required maxLength={80} pattern="[a-zA-Z0-9-]{3,80}" className={`${fieldClass} mt-1.5`} value={reference} onChange={event => setReference(event.target.value)} /></label>
-          <p className="text-xs academy-muted">Your access starts only after the admin verifies the transaction and approves it.</p>
-          <button className={buttonClass} disabled={busy || (paymentMethod === 'telebirr' && !account.telebirrAccountNumber) || requests.some(request => request.status === 'pending')}>{busy ? 'Submitting…' : 'Submit for admin review'}</button>
+         <form onSubmit={submit} className="space-y-4">
+           <div><h2 className="font-serif-title text-xl font-bold">{t('2. Submit the transaction reference')}</h2><p className="mt-1 text-sm academy-muted">{t('Enter the reference from your Telebirr or CBE payment confirmation. No screenshot is needed.')}</p></div>
+           <label className="block text-xs font-bold">{t('Transaction reference')}<input required maxLength={80} pattern="[a-zA-Z0-9-]{3,80}" className={`${fieldClass} mt-1.5`} value={reference} onChange={event => setReference(event.target.value)} /></label>
+           <p className="text-xs academy-muted">{t('Your access starts only after the admin verifies the transaction and approves it.')}</p>
+           <button className={buttonClass} disabled={busy || (paymentMethod === 'telebirr' && !account.telebirrAccountNumber) || requests.some(request => request.status === 'pending')}>{busy ? t('Submitting…') : t('Submit for admin review')}</button>
         </form>
       </div>
-      <section className="academy-card overflow-hidden"><h2 className="border-b academy-line p-5 font-serif-title text-xl font-bold">Your requests</h2><div className="divide-y academy-line">{requests.map(item => <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm"><div><p className="font-bold">{item.amount_etb.toLocaleString()} ETB · {item.payment_method === 'cbe' ? 'CBE' : 'Telebirr'} · {item.transaction_reference}</p><p className="mt-1 text-xs academy-muted">{new Date(item.submitted_at).toLocaleString()}</p></div><span className="rounded-full bg-[#e6f1ed] px-3 py-1 text-xs font-bold capitalize dark:bg-[#263a35]">{item.status}</span>{item.rejection_reason && <p className="w-full text-xs text-red-700">{item.rejection_reason}</p>}</div>)}{!requests.length && <p className="p-5 text-sm academy-muted">No requests submitted yet.</p>}</div></section>
+      <section className="academy-card overflow-hidden"><h2 className="border-b academy-line p-5 font-serif-title text-xl font-bold">{t('Your requests')}</h2><div className="divide-y academy-line">{requests.map(item => <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm"><div><p className="font-bold">{item.amount_etb.toLocaleString()} ETB · {item.payment_method === 'cbe' ? 'CBE' : 'Telebirr'} · {item.transaction_reference}</p><p className="mt-1 text-xs academy-muted">{new Date(item.submitted_at).toLocaleString()}</p></div><span className="rounded-full bg-[#e6f1ed] px-3 py-1 text-xs font-bold capitalize dark:bg-[#263a35]">{item.status}</span>{item.rejection_reason && <p className="w-full text-xs text-red-700">{item.rejection_reason}</p>}</div>)}{!requests.length && <p className="p-5 text-sm academy-muted">{t('No requests submitted yet.')}</p>}</div></section>
     </section>
   );
 };

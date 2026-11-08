@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { UserProfile, SubscriptionStatus } from '../types';
 import {
   Users,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
+  const { t } = useLanguage();
   const {
     users,
     adminApproveUser,
@@ -75,15 +77,15 @@ export const AdminDashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
             <ShieldCheck className="w-4 h-4" />
-            <span>Administrator Control Dashboard</span>
+            <span>{t('Administrator Control Dashboard')}</span>
             <span>·</span>
             <span>Demo administrator</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 mt-1">
-            Subscription Approvals & Student Management
+            {t('Subscription Approvals & Student Management')}
           </h1>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-            Local demonstration only. Account approvals and access changes affect this browser only; no payment is verified and this is not a secure admin system.
+            {t('Local demonstration only. Account approvals and access changes affect this browser only; no payment is verified and this is not a secure admin system.')}
           </p>
         </div>
 
@@ -92,33 +94,33 @@ export const AdminDashboard: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Enrolled</span>
+          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{t('Total Enrolled')}</span>
           <div className="text-2xl md:text-3xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-100 mt-1">
             {totalUsers}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Active & Trial Students</span>
+          <span className="text-[11px] text-neutral-400 mt-1 block">{t('Active & Trial Students')}</span>
         </div>
 
         <div className="bg-white dark:bg-neutral-900 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 shadow-xs bg-amber-50/20">
-          <span className="text-xs font-bold text-amber-800 dark:text-amber-400">Pending Telebirr Approvals</span>
+          <span className="text-xs font-bold text-amber-800 dark:text-amber-400">{t('Pending Telebirr Approvals')}</span>
           <div className="text-2xl md:text-3xl font-bold font-mono-numbers text-amber-700 dark:text-amber-400 mt-1">
             {pendingUsers.length}
           </div>
           <span className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 block">
-            {pendingUsers.length > 0 ? 'Requires your approval' : 'All requests processed'}
+            {t(pendingUsers.length > 0 ? 'Requires your approval' : 'All requests processed')}
           </span>
         </div>
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Active Paid (30 Days)</span>
+          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{t('Active Paid (30 Days)')}</span>
           <div className="text-2xl md:text-3xl font-bold font-mono-numbers text-emerald-600 dark:text-emerald-400 mt-1">
             {activePaidUsers.length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Full Academy Access</span>
+          <span className="text-[11px] text-neutral-400 mt-1 block">{t('Full Academy Access')}</span>
         </div>
 
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total Telebirr Revenue</span>
+          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{t('Total Telebirr Revenue')}</span>
           <div className="text-2xl md:text-3xl font-bold font-mono-numbers text-neutral-900 dark:text-neutral-100 mt-1">
             {formatETB(totalRevenueETB)} <span className="text-sm font-sans font-normal text-neutral-500">ETB</span>
           </div>

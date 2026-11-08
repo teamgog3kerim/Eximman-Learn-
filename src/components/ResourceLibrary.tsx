@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { RESOURCE_LIBRARY } from '../data/resourceData';
 import { ResourceDocument } from '../types';
 import { useApp } from '../context/AppContext';
+import { useLanguage, useLocalizedResourceLibrary } from '../context/LanguageContext';
 import {
   FileText,
   Download,
@@ -25,6 +25,8 @@ import { LogisticsTradeGlossary } from './LogisticsTradeGlossary';
 
 export const ResourceLibrary: React.FC = () => {
   const { setActiveNavTab, setSelectedChapterId } = useApp();
+  const { language, t } = useLanguage();
+  const resources = useLocalizedResourceLibrary();
   const [resourceViewTab, setResourceViewTab] = useState<'documents' | 'glossary'>('documents');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -33,15 +35,15 @@ export const ResourceLibrary: React.FC = () => {
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
 
   const categories = [
-    { id: 'all', label: 'All Resources' },
-    { id: 'regulation', label: 'Regulations & Directives' },
-    { id: 'tariff', label: 'Tariffs & Customs Taxes' },
-    { id: 'template', label: 'Excel Models & Templates' },
-    { id: 'checklist', label: 'Checklists & Protocols' },
-    { id: 'guideline', label: 'Corridor & Export SOPs' }
+    { id: 'all', label: t('All Resources') },
+    { id: 'regulation', label: t('Regulations & Directives') },
+    { id: 'tariff', label: t('Tariffs & Customs Taxes') },
+    { id: 'template', label: t('Excel Models & Templates') },
+    { id: 'checklist', label: t('Checklists & Protocols') },
+    { id: 'guideline', label: t('Corridor & Export SOPs') }
   ];
 
-  const filteredDocs = RESOURCE_LIBRARY.filter(doc => {
+  const filteredDocs = resources.filter(doc => {
     const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
     const matchesSearch =
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +60,26 @@ export const ResourceLibrary: React.FC = () => {
   };
 
   const handleDownload = (doc: ResourceDocument) => {
-    const content = `=====================================================
+    const content = language === 'am' ? `=====================================================
+${doc.title}
+ባለሥልጣን፦ ${doc.authority}
+ዘርፍ፦ ${doc.category.toUpperCase()} | ቅርጸት፦ ${doc.format}
+=====================================================
+
+መግለጫ፦
+${doc.description}
+
+ዋና ዋና የደንብ ነጥቦች፦
+${doc.keyHighlights.map((h, i) => `${i + 1}. ${h}`).join('\n')}
+
+የናሙና ቅንጭብ (ኦፊሴላዊ ሰነድ አይደለም)፦
+-----------------------------------------------------
+${doc.samplePreviewText}
+-----------------------------------------------------
+
+ይህ የጽሑፍ ትምህርታዊ ማጠቃለያ በአካባቢያዊ ማሳያው ውስጥ ካለ የናሙና ይዘት የተዘጋጀ ነው።
+ኦፊሴላዊ ሰነድ አይደለም፤ የአሁኑን ደንቦች ከሰጪው ተቋም ከማረጋገጥ አይተካም። PDF፣ የስሌት ሉህ ወይም Word ፋይል አልተያያዘም።
+` : `=====================================================
 ${doc.title}
 Authority: ${doc.authority}
 Category: ${doc.category.toUpperCase()} | Format: ${doc.format}
@@ -90,7 +111,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
     document.body.removeChild(link);
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    setDownloadSuccess(`Downloaded the sample text summary for "${doc.title}". It is not the official ${doc.format} document.`);
+    setDownloadSuccess(language === 'am' ? `የናሙና ማጠቃለያው ወርዷል። ይህ ኦፊሴላዊ ${doc.format} ሰነድ አይደለም።` : `Downloaded the sample text summary for "${doc.title}". It is not the official ${doc.format} document.`);
     setTimeout(() => setDownloadSuccess(null), 3500);
   };
 
@@ -133,13 +154,13 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
         <div className="relative z-10 max-w-3xl space-y-3">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
             <Shield className="w-4 h-4" />
-            <span>Document Repository & Regulatory Compliance Toolkit</span>
+            <span>{t('Document Repository & Regulatory Compliance Toolkit')}</span>
           </div>
           <h1 className="text-2xl md:text-4xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
-            Ethiopian Trade & Logistics Resource Library
+            {t('Ethiopian Trade & Logistics Resource Library')}
           </h1>
           <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            Browse sample descriptions and excerpts saved with this demo. It does not include the official source documents, verified download files, or live regulatory updates. Check current rules with the issuing authorities.
+            {t('Browse sample descriptions and excerpts saved with this demo. It does not include the official source documents, verified download files, or live regulatory updates. Check current rules with the issuing authorities.')}
           </p>
         </div>
       </div>
@@ -155,13 +176,13 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
           }`}
         >
           <FileText className="w-4 h-4 text-amber-500" />
-          <span>Regulatory Documents & Directives</span>
+          <span>{t('Regulatory Documents & Directives')}</span>
           <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ml-1 ${
             resourceViewTab === 'documents'
               ? 'bg-amber-500 text-neutral-950'
               : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
           }`}>
-            {RESOURCE_LIBRARY.length}
+            {resources.length}
           </span>
         </button>
 
@@ -174,7 +195,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
           }`}
         >
           <Compass className="w-4 h-4 text-amber-400" />
-          <span>Logistics & Trade Glossary</span>
+          <span>{t('Logistics & Trade Glossary')}</span>
           <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ml-1 ${
             resourceViewTab === 'glossary'
               ? 'bg-white/20 text-white'
@@ -240,7 +261,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
           </div>
 
           <div className="text-xs text-neutral-500 font-mono shrink-0">
-            Showing {filteredDocs.length} of {RESOURCE_LIBRARY.length} documents
+            {language === 'am' ? `ከ${resources.length} ሰነዶች ${filteredDocs.length} እየታዩ ነው` : `Showing ${filteredDocs.length} of ${resources.length} documents`}
           </div>
         </div>
 
@@ -305,7 +326,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
                 {/* Key Highlights */}
                 <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800/80 space-y-1.5">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                    Key Provisions Covered:
+                    {t('Key Provisions Covered:')}
                   </div>
                   <ul className="space-y-1 text-xs text-neutral-600 dark:text-neutral-400">
                     {doc.keyHighlights.slice(0, 3).map((h, idx) => (
@@ -340,7 +361,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
                     className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-1.5"
                   >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>Read Preview</span>
+                    <span>{t('Read Preview')}</span>
                   </button>
 
                   <button
@@ -348,7 +369,7 @@ rules with the issuing authority. No PDF, spreadsheet or Word file is supplied.
                     className="flex-1 py-2 px-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-black dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white text-white transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download sample summary</span>
+                    <span>{t('Download sample summary')}</span>
                   </button>
                 </div>
               </div>
