@@ -89,7 +89,7 @@ export function PublicLanding() {
             <span className="h-1.5 w-1.5 rounded-full bg-[#b76e36]" /> Ethiopia-specific trade practice
           </div>
           <h1 className="max-w-[740px] font-serif-title text-[clamp(3.25rem,7.4vw,6.4rem)] leading-[.94] tracking-[-.055em] text-[#193a34]">
-            Trade is learned<br /><span className="italic text-[#a45e2f]">in the details.</span>
+            Trade is learned<br /><span className="italic text-[#a45e2f]">in details.</span>
           </h1>
           <p className="mt-7 max-w-[560px] text-base leading-7 text-[#5c6b63] sm:text-lg sm:leading-8">
             Practical learning for the people moving goods across borders. Understand the paperwork, banking, customs and logistics behind importing and exporting in Ethiopia.
