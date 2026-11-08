@@ -176,13 +176,19 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 
 function requireSameOrigin(req: Request, res: Response, next: NextFunction) {
   const origin = req.get('origin');
-  if (origin) {
-    try {
-      const expectedHost = getClerkProxyHost(req);
-      if (new URL(origin).host !== expectedHost) return res.status(403).json({ error: 'Request origin was not accepted.' });
-    } catch {
+  const isWrite = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);
+  if (!origin && isWrite) {
+    return res.status(403).json({ error: 'A same-origin request is required.' });
+  }
+  if (!origin) return next();
+
+  try {
+    const expectedHost = getClerkProxyHost(req);
+    if (new URL(origin).host !== expectedHost) {
       return res.status(403).json({ error: 'Request origin was not accepted.' });
     }
+  } catch {
+    return res.status(403).json({ error: 'Request origin was not accepted.' });
   }
   next();
 }
@@ -190,7 +196,7 @@ function requireSameOrigin(req: Request, res: Response, next: NextFunction) {
 app.use('/api', requireIdentity);
 app.use('/api', requireSameOrigin);
 
-app.get('/api/me', async (_req, res) => {
+app.get('/api/me', asyncRoute(async (_req, res) => {
   const identity = res.locals.identity as Identity;
   const subscription = await pool.query(
     `SELECT status, expires_at FROM academy_payment_requests
@@ -212,7 +218,7 @@ app.get('/api/me', async (_req, res) => {
     expiresAt: active ? latest.expires_at : null,
     paymentAmount: active ? SUBSCRIPTION_PRICE_ETB : 0,
   });
-});
+}));
 
 async function learnerAccess(identity: Identity) {
   if (identity.isAdmin) return { full: true, trial: true };
@@ -359,7 +365,7 @@ app.patch('/api/progress', asyncRoute(async (req, res) => {
   res.json({ progress: progressFromRow(result.rows[0]) });
 }));
 
-app.get('/api/payment-settings', async (_req, res) => {
+app.get('/api/payment-settings', asyncRoute(async (_req, res) => {
   const result = await pool.query(
     'SELECT telebirr_account_name, telebirr_account_number, cbe_account_number FROM academy_payment_settings WHERE id = 1',
   );
@@ -369,17 +375,17 @@ app.get('/api/payment-settings', async (_req, res) => {
     telebirrAccountNumber: result.rows[0]?.telebirr_account_number || '',
     cbeAccountNumber: result.rows[0]?.cbe_account_number || '1000342413904',
   });
-});
+}));
 
-app.get('/api/payment-requests', async (_req, res) => {
+app.get('/api/payment-requests', asyncRoute(async (_req, res) => {
   const identity = res.locals.identity as Identity;
   const result = identity.isAdmin
     ? await pool.query(`SELECT id, learner_email, amount_etb, transaction_reference, payment_method, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests ORDER BY submitted_at DESC LIMIT 300`)
     : await pool.query(`SELECT id, amount_etb, transaction_reference, payment_method, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests WHERE clerk_user_id = $1 ORDER BY submitted_at DESC LIMIT 25`, [identity.userId]);
   res.json({ requests: result.rows });
-});
+}));
 
-app.post('/api/payment-requests', async (req, res) => {
+app.post('/api/payment-requests', asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   if (identity.isAdmin) return res.status(400).json({ error: 'Administrators do not need a learner subscription.' });
   const paymentMethod = req.body?.paymentMethod;
@@ -403,22 +409,38 @@ app.post('/api/payment-requests', async (req, res) => {
   if (!recipientConfigured) {
     return res.status(409).json({ error: 'The selected payment account is not set up yet. Please choose another method or check back later.' });
   }
-  const pending = await pool.query(
-    `SELECT id FROM academy_payment_requests WHERE clerk_user_id = $1 AND status = 'pending' LIMIT 1`,
-    [identity.userId],
-  );
-  if (pending.rowCount) return res.status(409).json({ error: 'You already have a payment request waiting for review.' });
-  const result = await pool.query(
-    `INSERT INTO academy_payment_requests
-      (clerk_user_id, learner_email, amount_etb, transaction_reference, payment_method)
-     VALUES ($1,$2,$3,$4,$5)
-     RETURNING id, amount_etb, transaction_reference, payment_method, status, submitted_at`,
-    [identity.userId, identity.email, SUBSCRIPTION_PRICE_ETB, reference, paymentMethod],
-  );
-  res.status(201).json({ request: result.rows[0] });
-});
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [identity.userId]);
+    const pending = await client.query(
+      `SELECT id FROM academy_payment_requests WHERE clerk_user_id = $1 AND status = 'pending' LIMIT 1`,
+      [identity.userId],
+    );
+    if (pending.rowCount) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'You already have a payment request waiting for review.' });
+    }
+    const result = await client.query(
+      `INSERT INTO academy_payment_requests
+        (clerk_user_id, learner_email, amount_etb, transaction_reference, payment_method)
+       VALUES ($1,$2,$3,$4,$5)
+       RETURNING id, amount_etb, transaction_reference, payment_method, status, submitted_at`,
+      [identity.userId, identity.email, SUBSCRIPTION_PRICE_ETB, reference, paymentMethod],
+    );
+    await client.query('COMMIT');
+    res.status(201).json({ request: result.rows[0] });
+  } catch (error) {
+    await client.query('ROLLBACK').catch(rollbackError => {
+      console.error('Could not roll back a payment request transaction.', rollbackError);
+    });
+    throw error;
+  } finally {
+    client.release();
+  }
+}));
 
-app.get('/api/admin/users', requireAdmin, async (_req, res) => {
+app.get('/api/admin/users', requireAdmin, asyncRoute(async (_req, res) => {
   const users = await clerk.users.getUserList({ limit: 200 });
   const rows = await Promise.all(users.data.map(async user => {
     const primary = user.emailAddresses.find(item => item.id === user.primaryEmailAddressId);
@@ -441,18 +463,18 @@ app.get('/api/admin/users', requireAdmin, async (_req, res) => {
     };
   }));
   res.json({ users: rows });
-});
+}));
 
-app.get('/api/admin/payment-settings', requireAdmin, async (_req, res) => {
+app.get('/api/admin/payment-settings', requireAdmin, asyncRoute(async (_req, res) => {
   const result = await pool.query('SELECT telebirr_account_name, telebirr_account_number, cbe_account_number FROM academy_payment_settings WHERE id = 1');
   res.json({
     telebirrAccountName: result.rows[0]?.telebirr_account_name || '',
     telebirrAccountNumber: result.rows[0]?.telebirr_account_number || '',
     cbeAccountNumber: result.rows[0]?.cbe_account_number || '1000342413904',
   });
-});
+}));
 
-app.put('/api/admin/payment-settings', requireAdmin, async (req, res) => {
+app.put('/api/admin/payment-settings', requireAdmin, asyncRoute(async (req, res) => {
   const name = String(req.body?.telebirrAccountName || '').trim();
   const telebirrNumber = String(req.body?.telebirrAccountNumber || '').replace(/\s/g, '');
   const cbeNumber = String(req.body?.cbeAccountNumber || '').replace(/\s/g, '');
@@ -470,9 +492,9 @@ app.put('/api/admin/payment-settings', requireAdmin, async (req, res) => {
     [name, telebirrNumber, cbeNumber],
   );
   res.json({ success: true });
-});
+}));
 
-app.post('/api/admin/payment-requests/:id/review', requireAdmin, async (req, res) => {
+app.post('/api/admin/payment-requests/:id/review', requireAdmin, asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   const action = req.body?.action;
   const reason = String(req.body?.reason || '').trim().slice(0, 500);
@@ -489,7 +511,7 @@ app.post('/api/admin/payment-requests/:id/review', requireAdmin, async (req, res
   );
   if (!result.rowCount) return res.status(404).json({ error: 'This request was already reviewed or no longer exists.' });
   res.json({ request: result.rows[0] });
-});
+}));
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Request failed.', error);
