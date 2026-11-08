@@ -1,8 +1,8 @@
 # EthioDeploy deployment
 
-This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. The intended Nixpacks install command is `npm install --include=dev --no-audit --no-fund --package-lock=true`, which retains the checked-in lockfile and installs Vite/esbuild build dependencies. However, an EthioDeploy build of commit `5653f34` still generated and ran `npm ci`, despite the root `nixpacks.toml`. Do not assume the repository config is applied by the remote builder.
+This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. The intended Nixpacks install command is `npm install --include=dev --no-audit --no-fund --package-lock=true`, which retains the checked-in lockfile and installs Vite/esbuild build dependencies. EthioDeploy's Build & Deploy settings override the repository config, so verify the command shown in the generated Nixpacks plan.
 
-In EthioDeploy's **Build & Deploy → Install Command** field, use `npm install --include=dev --no-audit --no-fund --package-lock=true`. Confirm the build plan reports this command before retrying. If it still reports `npm ci`, the override is not reaching Nixpacks; resolve that in the EthioDeploy service settings rather than changing the app's dependency tree.
+In EthioDeploy's **Build & Deploy → Install Command** field, use `npm install --include=dev --no-audit --no-fund --package-lock=true`. A recent build used the correct command but still exited after about 72 seconds with npm's generic “Exit handler never called” error; the available output did not include the underlying npm debug trace. If this repeats, request the full npm debug log from EthioDeploy before changing dependencies. The Docker warning about `$NIXPACKS_PATH` is separate from this npm failure.
 - Build: `npm run build`
 - Start: `npm start`
 - Runtime: Node.js 22
