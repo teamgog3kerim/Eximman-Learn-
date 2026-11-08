@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLocalizedCourseModules } from '../context/LanguageContext';
 import {
   Award,
   CheckCircle2,
@@ -23,6 +23,7 @@ import {
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const CertificationView: React.FC = () => {
+  const COURSE_MODULES = useLocalizedCourseModules();
   const {
     currentUser,
     completedChaptersCount,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLocalizedCourseModules } from '../context/LanguageContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Chapter, QuizQuestion } from '../types';
 import {
   BookOpen,
@@ -27,6 +28,8 @@ import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 
 export const CourseViewer: React.FC = () => {
+  const COURSE_MODULES = useLocalizedCourseModules();
+  const { t } = useLanguage();
   const {
     currentUser,
     hasFullAccess,
@@ -132,14 +135,14 @@ export const CourseViewer: React.FC = () => {
                 onClick={() => setActiveNavTab('progress')}
                 className="text-neutral-600 dark:text-neutral-400 hover:text-amber-700 dark:hover:text-amber-400 flex items-center gap-1"
               >
-                <span>Records Tracker</span>
+                <span>{t('Records Tracker')}</span>
                 <ArrowRight className="w-2.5 h-2.5" />
               </button>
               <button
                 onClick={() => setActiveNavTab('certificate')}
                 className="text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1"
               >
-                <span>Certification</span>
+                <span>{t('Certification')}</span>
                 <Award className="w-2.5 h-2.5" />
               </button>
             </div>
@@ -158,7 +161,7 @@ export const CourseViewer: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <ClipboardCheck className={`w-4 h-4 ${activeTab === 'checklist' ? 'text-white' : 'text-amber-700 dark:text-amber-400'}`} />
-              <span>Export Checklist Tool</span>
+              <span>{t('Export Checklist Tool')}</span>
             </div>
             <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
               activeTab === 'checklist' ? 'bg-white/20 text-white' : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100'
@@ -254,7 +257,7 @@ export const CourseViewer: React.FC = () => {
           <div className="bg-amber-950 text-white rounded-2xl p-5 space-y-3 shadow-md border border-amber-800">
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
               <Sparkles className="w-4 h-4" />
-              <span>Full Academy Access</span>
+              <span>{t('Full Academy Access')}</span>
             </div>
             <h3 className="text-base font-serif-title font-bold text-white">
               Additional course chapters
@@ -343,7 +346,7 @@ export const CourseViewer: React.FC = () => {
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Study Guide & Rules</span>
+                <span>{t('Study Guide & Rules')}</span>
               </button>
 
               <button
@@ -355,7 +358,7 @@ export const CourseViewer: React.FC = () => {
                 }`}
               >
                 <Anchor className="w-3.5 h-3.5" />
-                <span>Visual Process Diagram</span>
+                <span>{t('Visual Process Diagram')}</span>
               </button>
 
               {currentChapter.caseStudy && (
@@ -368,7 +371,7 @@ export const CourseViewer: React.FC = () => {
                   }`}
                 >
                   <Briefcase className="w-3.5 h-3.5" />
-                  <span>Real Ethiopian Case Study</span>
+                  <span>{t('Real Ethiopian Case Study')}</span>
                 </button>
               )}
 
@@ -393,14 +396,14 @@ export const CourseViewer: React.FC = () => {
                 }`}
               >
                 <ClipboardCheck className="w-3.5 h-3.5" />
-                <span>Document Checklist Generator</span>
+                <span>{t('Document Checklist Generator')}</span>
               </button>
             </div>
           )}
         </div>
 
         {/* LOCKED CHAPTER PAYWALL OVERLAY */}
-        <nav aria-label="Lesson navigation" className="flex items-center justify-between gap-2">
+        <nav aria-label={t('Lesson navigation')} className="flex items-center justify-between gap-2">
           <button
             type="button"
             disabled={!canOpenChapter(previousChapter)}
@@ -555,7 +558,7 @@ export const CourseViewer: React.FC = () => {
                     className="px-4 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shrink-0 transition-colors shadow-xs"
                   >
                     <ClipboardCheck className="w-4 h-4" />
-                    <span>Launch Checklist Generator</span>
+                    <span>{t('Launch Checklist Generator')}</span>
                   </button>
                 </div>
               </div>
@@ -1031,7 +1034,7 @@ export const CourseViewer: React.FC = () => {
                       }}
                       className="flex items-center gap-2 px-5 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                     >
-                      <span>Proceed to Next Chapter</span>
+                      <span>{t('Proceed to Next Chapter')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   )}

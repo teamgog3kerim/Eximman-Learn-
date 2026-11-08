@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLocalizedCourseModules } from '../context/LanguageContext';
 import {
   CheckCircle2,
   Clock,
@@ -22,6 +22,7 @@ import {
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const RecordsTracker: React.FC = () => {
+  const COURSE_MODULES = useLocalizedCourseModules();
   const {
     currentUser,
     hasFullAccess,

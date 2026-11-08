@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowDownRight, ArrowRight, BookOpen, Check, Clock3, FileText, Landmark, PackageCheck, Play, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLocalizedCourseModules } from '../context/LanguageContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const toolLinks = [
   { tab: 'landed_cost', title: 'Landed cost build-up', description: 'Bring purchase, freight, banking and clearance costs together.', icon: PackageCheck },
@@ -10,6 +11,8 @@ const toolLinks = [
 ] as const;
 
 export const LearningDashboard: React.FC = () => {
+  const COURSE_MODULES = useLocalizedCourseModules();
+  const { t } = useLanguage();
   const {
     currentUser, completedChaptersCount, progressPercentage, isChapterCompleted,
     setActiveNavTab, setSelectedChapterId, quizScores
@@ -33,25 +36,25 @@ export const LearningDashboard: React.FC = () => {
         <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
           <div className="max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.15em] text-[#d8e8dd]">
-              <Sparkles className="h-3.5 w-3.5" /> Your learning desk
+              <Sparkles className="h-3.5 w-3.5" /> {t('Your learning desk')}
             </div>
             <h1 className="font-serif-title text-3xl font-extrabold leading-tight tracking-[-.045em] sm:text-4xl">
-              Trade knowledge, <span className="text-[#d4ad78]">put to work.</span>
+              {t('Trade knowledge, ')}<span className="text-[#d4ad78]">{t('put to work.')}</span>
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#d5e3dc] sm:text-base">
               Welcome back, {currentUser.fullName.split(' ')[0]}. Build practical confidence in Ethiopian import, export and logistics—one lesson and one calculation at a time.
             </p>
             <button onClick={continueLearning} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#f1d4a5] px-4 py-2.5 text-sm font-bold text-[#243a34] transition hover:bg-[#f8e3c2]">
-              <Play className="h-4 w-4 fill-current" /> Continue learning <ArrowRight className="h-4 w-4" />
+              <Play className="h-4 w-4 fill-current" /> {t('Continue learning')} <ArrowRight className="h-4 w-4" />
             </button>
           </div>
           <div className="relative min-w-44 rounded-2xl border border-white/15 bg-white/[.08] p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between text-xs text-[#d5e3dc]">
-              <span>Course progress</span><BookOpen className="h-4 w-4" />
+               <span>{t('Course progress')}</span><BookOpen className="h-4 w-4" />
             </div>
             <div className="mt-3 flex items-end gap-2">
               <span className="font-serif-title text-4xl font-bold tracking-tight">{progressPercentage}%</span>
-              <span className="pb-1 text-xs text-[#d5e3dc]">{completedChaptersCount} of {chapters.length} lessons</span>
+              <span className="pb-1 text-xs text-[#d5e3dc]">{completedChaptersCount}{t(' of ')}{chapters.length}{t(' lessons')}</span>
             </div>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20">
               <div className="h-full rounded-full bg-[#dfbd8c] transition-all" style={{ width: `${progressPercentage}%` }} />
@@ -60,26 +63,26 @@ export const LearningDashboard: React.FC = () => {
         </div>
       </section>
 
-      <section aria-label="Learning snapshot" className="grid gap-3 sm:grid-cols-3">
+      <section aria-label={t('Learning snapshot')} className="grid gap-3 sm:grid-cols-3">
         <div className="academy-card flex items-center gap-4 p-4 sm:p-5">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f1ed] text-[#176b60]"><Check className="h-5 w-5" /></div>
-          <div><p className="text-xs font-semibold academy-muted">Lessons completed</p><p className="mt-0.5 font-serif-title text-2xl font-bold">{completedChaptersCount}<span className="ml-1 text-sm font-medium academy-muted">/ {chapters.length}</span></p></div>
+          <div><p className="text-xs font-semibold academy-muted">{t('Lessons completed')}</p><p className="mt-0.5 font-serif-title text-2xl font-bold">{completedChaptersCount}<span className="ml-1 text-sm font-medium academy-muted">/ {chapters.length}</span></p></div>
         </div>
         <div className="academy-card flex items-center gap-4 p-4 sm:p-5">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f7eee2] text-[#9b622e]"><Sparkles className="h-5 w-5" /></div>
-          <div><p className="text-xs font-semibold academy-muted">Quiz attempts saved</p><p className="mt-0.5 font-serif-title text-2xl font-bold">{completedQuizzes}</p></div>
+          <div><p className="text-xs font-semibold academy-muted">{t('Quiz attempts saved')}</p><p className="mt-0.5 font-serif-title text-2xl font-bold">{completedQuizzes}</p></div>
         </div>
         <div className="academy-card flex items-center gap-4 p-4 sm:p-5">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#edf0e9] text-[#4f675b]"><Clock3 className="h-5 w-5" /></div>
-          <div><p className="text-xs font-semibold academy-muted">Learning pathway</p><p className="mt-0.5 text-sm font-bold">{COURSE_MODULES.length} modules · {chapters.length} lessons</p></div>
+          <div><p className="text-xs font-semibold academy-muted">{t('Learning pathway')}</p><p className="mt-0.5 text-sm font-bold">{COURSE_MODULES.length}{t(' modules · ')}{chapters.length}{t(' lessons')}</p></div>
         </div>
       </section>
 
       <section className="grid gap-8 lg:grid-cols-[1.35fr_.75fr]">
         <div>
           <div className="mb-4 flex items-end justify-between gap-3">
-            <div><p className="text-[11px] font-bold uppercase tracking-[.16em] academy-brand">Structured curriculum</p><h2 className="mt-1 font-serif-title text-2xl font-bold tracking-tight">Pick up where practice begins</h2></div>
-            <button onClick={() => setActiveNavTab('curriculum')} className="inline-flex items-center gap-1 text-xs font-bold academy-brand hover:underline">All lessons <ArrowRight className="h-3.5 w-3.5" /></button>
+            <div><p className="text-[11px] font-bold uppercase tracking-[.16em] academy-brand">{t('Structured curriculum')}</p><h2 className="mt-1 font-serif-title text-2xl font-bold tracking-tight">{t('Pick up where practice begins')}</h2></div>
+            <button onClick={() => setActiveNavTab('curriculum')} className="inline-flex items-center gap-1 text-xs font-bold academy-brand hover:underline">{t('All lessons')} <ArrowRight className="h-3.5 w-3.5" /></button>
           </div>
           <div className="space-y-3">
             {COURSE_MODULES.map((module, index) => {
@@ -93,8 +96,8 @@ export const LearningDashboard: React.FC = () => {
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${isCurrent ? 'bg-[#176b60] text-white' : 'bg-[#e8ede8] text-[#53635b] dark:bg-[#34413c] dark:text-[#e1e9e3]'}`}>{String(index + 1).padStart(2, '0')}</div>
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-[.12em] academy-muted">Module {module.moduleNumber}</span>
-                          {isCurrent && <span className="rounded-full bg-[#e6f1ed] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#176b60] dark:bg-[#263a35] dark:text-[#b5dfd2]">Up next</span>}
+                          <span className="text-[10px] font-bold uppercase tracking-[.12em] academy-muted">{t('Module')} {module.moduleNumber}</span>
+                          {isCurrent && <span className="rounded-full bg-[#e6f1ed] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#176b60] dark:bg-[#263a35] dark:text-[#b5dfd2]">{t('Up next')}</span>}
                         </div>
                         <h3 className="mt-1 text-sm font-bold leading-5">{module.title}</h3>
                         <p className="mt-1 text-xs leading-5 academy-muted">{module.subtitle}</p>
@@ -110,7 +113,7 @@ export const LearningDashboard: React.FC = () => {
                         }}
                         className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border academy-line px-3 text-xs font-bold transition hover:bg-[#e6f1ed] dark:hover:bg-[#263a35]"
                       >
-                        {moduleDone === module.chapters.length && module.chapters.length > 0 ? 'Review module' : 'Browse module'} <ArrowDownRight className="h-3.5 w-3.5" />
+                        {moduleDone === module.chapters.length && module.chapters.length > 0 ? t('Review module') : t('Browse module')} <ArrowDownRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>

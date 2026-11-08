@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, ArrowUpRight, Award, BookOpen, Calculator, ChevronDown, ClipboardCheck } from 'lucide-react';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLanguage, useLocalizedCourseModules } from '../context/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 type PublicAuthShellProps = {
   mode: 'sign-up' | 'sign-in';
@@ -9,6 +10,8 @@ type PublicAuthShellProps = {
 };
 
 export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
+  const { t } = useLanguage();
+  const modules = useLocalizedCourseModules();
   const signUp = mode === 'sign-up';
   return (
     <main className="academy-shell min-h-[100dvh]">
@@ -17,22 +20,22 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
           <img src="/logo.svg" alt="" className="h-10 w-10 rounded-xl" />
           <span><span className="block text-[13px] font-bold text-[#193a34]">Ethio Export-Import and Logistics</span><span className="block text-[10px] font-semibold uppercase tracking-[.16em] text-[#6d766d]">LEARNING ACADEMY</span></span>
         </Link>
-        <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#52665c] transition hover:text-[#a45e2f]"><ArrowLeft className="h-4 w-4" /> Back to overview</Link>
+        <div className="flex items-center gap-3"><LanguageSelector compact /><Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#52665c] transition hover:text-[#a45e2f]"><ArrowLeft className="h-4 w-4" /> {t('Back to overview')}</Link></div>
       </header>
       <div className="mx-auto grid max-w-[1240px] gap-10 px-5 pb-14 pt-5 sm:px-8 sm:pb-20 lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:gap-16 lg:px-12">
         <section className="relative overflow-hidden rounded-[26px] bg-[#1a433b] p-7 text-[#f8f3e8] sm:p-10 lg:min-h-[540px] lg:p-12">
           <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-[#e2b57b]/20" />
           <div className="relative">
             <p className="font-mono-numbers text-[10px] uppercase tracking-[.2em] text-[#e7b579]">Ethio Export-Import and Logistics Learning Academy</p>
-            <h1 className="mt-6 max-w-lg font-serif-title text-4xl leading-[1.04] tracking-[-.04em] sm:text-5xl">{signUp ? 'Make trade knowledge part of your toolkit.' : 'Pick up where your work left off.'}</h1>
-            <p className="mt-5 max-w-md text-sm leading-7 text-white/70">{signUp ? 'Set up an account, then explore practical learning on Ethiopian trade rules, import banking, logistics, customs and export procedures.' : 'Sign in to return to your learning workspace and continue with your saved progress.'}</p>
+            <h1 className="mt-6 max-w-lg font-serif-title text-4xl leading-[1.04] tracking-[-.04em] sm:text-5xl">{t(signUp ? 'Make trade knowledge part of your toolkit.' : 'Pick up where your work left off.')}</h1>
+            <p className="mt-5 max-w-md text-sm leading-7 text-white/70">{t(signUp ? 'Set up an account, then explore practical learning on Ethiopian trade rules, import banking, logistics, customs and export procedures.' : 'Sign in to return to your learning workspace and continue with your saved progress.')}</p>
             <div className="mt-9 border-t border-white/15 pt-6">
-              <p className="font-mono-numbers text-[10px] uppercase tracking-[.16em] text-[#e7b579]">Inside the curriculum</p>
+              <p className="font-mono-numbers text-[10px] uppercase tracking-[.16em] text-[#e7b579]">{t('Inside the curriculum')}</p>
               <ul className="mt-4 grid gap-3 text-xs text-white/85 sm:grid-cols-2">
-                <li className="flex gap-2"><span className="text-[#e7b579]">01</span> Single Window & trade rules</li>
-                <li className="flex gap-2"><span className="text-[#e7b579]">02</span> L/C and import banking</li>
-                <li className="flex gap-2"><span className="text-[#e7b579]">03</span> Customs & landed cost</li>
-                <li className="flex gap-2"><span className="text-[#e7b579]">04</span> Export & Forex retention</li>
+                <li className="flex gap-2"><span className="text-[#e7b579]">01</span> {t('Single Window & trade rules')}</li>
+                <li className="flex gap-2"><span className="text-[#e7b579]">02</span> {t('L/C and import banking')}</li>
+                <li className="flex gap-2"><span className="text-[#e7b579]">03</span> {t('Customs & landed cost')}</li>
+                <li className="flex gap-2"><span className="text-[#e7b579]">04</span> {t('Export & Forex retention')}</li>
               </ul>
             </div>
             <p className="mt-8 text-[11px] leading-5 text-white/55">Membership: 3,900 ETB / 30 days. Account creation does not change the subscription or payment process.</p>
@@ -69,7 +72,7 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
                 </a>
               </div>
               <div className="space-y-2">
-                {COURSE_MODULES.map((module, index) => (
+                {modules.map((module, index) => (
                   <details key={module.id} className="group rounded-2xl border border-[#d9d8cc] bg-[#fbf8f0] transition-colors open:border-[#a9b9a8] open:bg-white">
                     <summary className="flex cursor-pointer list-none items-center gap-4 rounded-2xl px-4 py-4 outline-none transition hover:bg-[#f4f2e9] focus-visible:ring-2 focus-visible:ring-[#b8753f] sm:px-5 [&::-webkit-details-marker]:hidden">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e8eee5] font-mono-numbers text-xs font-semibold text-[#1d5f52]">{String(index + 1).padStart(2, '0')}</span>

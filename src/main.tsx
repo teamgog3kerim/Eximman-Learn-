@@ -5,6 +5,7 @@ import { shadcn } from '@clerk/themes';
 import { Route, Router as WouterRouter, Switch, useLocation } from 'wouter';
 import App from './App';
 import { PublicAuthShell } from './components/PublicAuthShell';
+import { LanguageProvider } from './context/LanguageContext';
 import './index.css';
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -87,5 +88,5 @@ function ClerkRoutes() {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <WouterRouter base={basePath}><ClerkRoutes /></WouterRouter>,
+  <LanguageProvider><WouterRouter base={basePath}><ClerkRoutes /></WouterRouter></LanguageProvider>,
 );

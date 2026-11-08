@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLocalizedCourseModules } from '../context/LanguageContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { HelpCircle, CheckCircle2, Lock, ArrowRight, RotateCcw, Award } from 'lucide-react';
 import { AcademyWorkspaceSkin } from './AcademyWorkspaceSkin';
 
 export const QuizCenter: React.FC = () => {
+  const COURSE_MODULES = useLocalizedCourseModules();
+  const { t } = useLanguage();
   const {
     currentUser, hasFullAccess, setShowPaywallModal, setSelectedChapterId,
     setActiveNavTab, recordQuizScore, quizScores
@@ -68,15 +71,15 @@ export const QuizCenter: React.FC = () => {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-          <span>Knowledge Assessment Center</span>
+          <span>{t('Knowledge Assessment Center')}</span>
           <span>·</span>
-          <span>Interactive Practice</span>
+          <span>{t('Interactive Practice')}</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-serif-title font-bold text-neutral-900 dark:text-neutral-50">
-          Ethiopian Import & Export Practice Questionnaires
+          {t('Ethiopian Import & Export Practice Questionnaires')}
         </h1>
         <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
-          Test your mastery of NBE directives, LC settlement calculations, customs cascade tax tiers, and Djibouti corridor logistics with real exam-grade scenarios.
+          {t('Test your mastery of NBE directives, LC settlement calculations, customs cascade tax tiers, and Djibouti corridor logistics with real exam-grade scenarios.')}
         </p>
       </div>
 
@@ -90,7 +93,7 @@ export const QuizCenter: React.FC = () => {
               : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           }`}
         >
-          All Modules
+          {t('All Modules')}
         </button>
         {COURSE_MODULES.map(m => (
           <button
@@ -127,7 +130,7 @@ export const QuizCenter: React.FC = () => {
               {!isAccessible ? (
                 <span className="flex items-center gap-1 text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded-full">
                   <Lock className="w-3.5 h-3.5" />
-                  <span>Paid Chapter</span>
+                  <span>{t('Paid Chapter')}</span>
                 </span>
               ) : (
                 <button
@@ -137,7 +140,7 @@ export const QuizCenter: React.FC = () => {
                   }}
                   className="min-h-10 rounded-lg px-2 text-xs text-amber-700 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1"
                 >
-                  <span>Go to Study Notes</span>
+                  <span>{t('Go to Study Notes')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -242,7 +245,7 @@ export const QuizCenter: React.FC = () => {
                     {quizScores[chapter.id].score / quizScores[chapter.id].maxScore >= 0.6
                       ? ' The lesson is marked complete.'
                       : ' Review the lesson, then try again.'}
-                    <button type="button" onClick={() => handleRetake(chapter.quiz.map(question => question.id))} className="mt-2 min-h-10 rounded-lg px-2 font-bold underline sm:ml-3 sm:mt-0">Retake this quiz</button>
+                    <button type="button" onClick={() => handleRetake(chapter.quiz.map(question => question.id))} className="mt-2 min-h-10 rounded-lg px-2 font-bold underline sm:ml-3 sm:mt-0">{t('Retake this quiz')}</button>
                   </div>
                 )}
               </div>

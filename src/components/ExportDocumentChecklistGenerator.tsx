@@ -14,6 +14,7 @@ import {
   ExportDocumentItem
 } from '../types';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   FileText,
   CheckCircle2,
@@ -59,6 +60,7 @@ export const ExportDocumentChecklistGenerator: React.FC<Props> = ({
   initialCommodity = 'coffee',
   onOpenChapter
 }) => {
+  const { language } = useLanguage();
   const { setSelectedChapterId, setActiveNavTab } = useApp();
 
   // Wizard state
@@ -842,13 +844,16 @@ export const ExportDocumentChecklistGenerator: React.FC<Props> = ({
                             ? 'text-emerald-950 dark:text-emerald-300'
                             : 'text-neutral-900 dark:text-neutral-100'
                         }`}>
-                          {doc.name}
+                          {language === 'am' ? doc.amharicName || doc.name : doc.name}
                         </h4>
 
-                        {doc.amharicName && (
+                        {doc.amharicName && language === 'en' && (
                           <span className="text-xs text-neutral-500 font-sans">
                             ({doc.amharicName})
                           </span>
+                        )}
+                        {doc.amharicName && language === 'am' && (
+                          <span className="text-xs text-neutral-500 font-sans">({doc.name})</span>
                         )}
 
                         {doc.isMandatory ? (

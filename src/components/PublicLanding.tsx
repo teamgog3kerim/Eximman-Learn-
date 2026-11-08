@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { ArrowDown, ArrowRight, ArrowUpRight, BadgeCheck, BookOpen, ChevronRight, FileCheck2, Landmark, Menu, Route, Ship, X } from 'lucide-react';
-import { COURSE_MODULES } from '../data/courseData';
+import { useLanguage, useLocalizedCourseModules } from '../context/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 const topicIcons = [Landmark, FileCheck2, Ship, Route, BookOpen, BadgeCheck];
 
@@ -48,10 +49,12 @@ function CorridorIllustration() {
 }
 
 export function PublicLanding() {
+  const { t } = useLanguage();
+  const modules = useLocalizedCourseModules();
   const [activeModule, setActiveModule] = useState(0);
   const [expandedChapter, setExpandedChapter] = useState<number | null>(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const selectedModule = COURSE_MODULES[activeModule] ?? COURSE_MODULES[0];
+  const selectedModule = modules[activeModule] ?? modules[0];
   const chapters = selectedModule?.chapters ?? [];
 
   return (
@@ -59,14 +62,15 @@ export function PublicLanding() {
       <header className="relative z-20 mx-auto flex max-w-[1320px] items-center justify-between px-5 py-4 sm:px-8 lg:px-12">
         <Brand />
         <nav aria-label="Main navigation" className="hidden items-center gap-8 md:flex">
-          <a href="#curriculum" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">What you’ll learn</a>
-          <a href="#approach" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">How it works</a>
-          <a href="#membership" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">Membership</a>
+          <a href="#curriculum" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">{t('What you’ll learn')}</a>
+          <a href="#approach" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">{t('How it works')}</a>
+          <a href="#membership" className="text-sm font-semibold text-[#465b53] transition hover:text-[#a45e2f]">{t('Membership')}</a>
         </nav>
         <div className="hidden items-center gap-5 md:flex">
-          <Link href="/sign-in" className="text-sm font-bold text-[#1f4a40] transition hover:text-[#a45e2f]">Sign in</Link>
+          <LanguageSelector compact />
+          <Link href="/sign-in" className="text-sm font-bold text-[#1f4a40] transition hover:text-[#a45e2f]">{t('Sign in')}</Link>
           <Link href="/sign-up" className="inline-flex items-center gap-2 rounded-full bg-[#1d5f52] px-5 py-3 text-sm font-bold text-[#fbf8f0] transition hover:-translate-y-0.5 hover:bg-[#153f39]">
-            Create account <ArrowUpRight className="h-4 w-4" />
+            {t('Create account')} <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
         <button type="button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} className="rounded-xl border border-[#d4d7ca] p-2.5 text-[#1d4b41] md:hidden">
@@ -74,32 +78,33 @@ export function PublicLanding() {
         </button>
       </header>
       {menuOpen && <nav aria-label="Mobile navigation" className="relative z-20 mx-5 mb-3 grid gap-1 rounded-2xl border border-[#d9d8cc] bg-[#fbf8f0] p-3 shadow-lg md:hidden">
-        <a onClick={() => setMenuOpen(false)} href="#curriculum" className="rounded-xl px-3 py-3 text-sm font-semibold">What you’ll learn</a>
-        <a onClick={() => setMenuOpen(false)} href="#approach" className="rounded-xl px-3 py-3 text-sm font-semibold">How it works</a>
-        <a onClick={() => setMenuOpen(false)} href="#membership" className="rounded-xl px-3 py-3 text-sm font-semibold">Membership</a>
+        <a onClick={() => setMenuOpen(false)} href="#curriculum" className="rounded-xl px-3 py-3 text-sm font-semibold">{t('What you’ll learn')}</a>
+        <a onClick={() => setMenuOpen(false)} href="#approach" className="rounded-xl px-3 py-3 text-sm font-semibold">{t('How it works')}</a>
+        <a onClick={() => setMenuOpen(false)} href="#membership" className="rounded-xl px-3 py-3 text-sm font-semibold">{t('Membership')}</a>
+        <div className="px-3 py-2"><LanguageSelector /></div>
         <div className="flex gap-2 border-t border-[#e2dfd4] pt-3">
-          <Link href="/sign-in" className="flex-1 rounded-xl px-3 py-3 text-center text-sm font-bold text-[#1d5f52]">Sign in</Link>
-          <Link href="/sign-up" className="flex-1 rounded-xl bg-[#1d5f52] px-3 py-3 text-center text-sm font-bold text-white">Create account</Link>
+          <Link href="/sign-in" className="flex-1 rounded-xl px-3 py-3 text-center text-sm font-bold text-[#1d5f52]">{t('Sign in')}</Link>
+          <Link href="/sign-up" className="flex-1 rounded-xl bg-[#1d5f52] px-3 py-3 text-center text-sm font-bold text-white">{t('Create account')}</Link>
         </div>
       </nav>}
 
       <section className="relative mx-auto grid max-w-[1320px] items-center gap-10 px-5 pb-16 pt-8 sm:px-8 sm:pb-20 sm:pt-12 lg:grid-cols-[1.02fr_.98fr] lg:gap-12 lg:px-12 lg:pb-24">
         <div className="landing-rise relative z-10">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#d9c8aa] bg-[#f8f0e1] px-3.5 py-2 text-[10px] font-bold uppercase tracking-[.17em] text-[#815a33]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#b76e36]" /> Ethiopia-specific trade practice
+            <span className="h-1.5 w-1.5 rounded-full bg-[#b76e36]" /> {t('Ethiopia-specific trade practice')}
           </div>
           <h1 className="max-w-[740px] font-serif-title text-[clamp(3.25rem,7.4vw,6.4rem)] leading-[.94] tracking-[-.055em] text-[#193a34]">
-            Trade is learned<br /><span className="italic text-[#a45e2f]">in details.</span>
+            {t('Trade is learned')}<br /><span className="italic text-[#a45e2f]">{t('in details.')}</span>
           </h1>
           <p className="mt-7 max-w-[560px] text-base leading-7 text-[#5c6b63] sm:text-lg sm:leading-8">
-            Practical learning for the people moving goods across borders. Understand the paperwork, banking, customs and logistics behind importing and exporting in Ethiopia.
+            {t('Practical learning for the people moving goods across borders. Understand the paperwork, banking, customs and logistics behind importing and exporting in Ethiopia.')}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link href="/sign-up" className="group inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full bg-[#1d5f52] px-7 text-sm font-bold text-[#fbf8f0] shadow-[0_8px_20px_rgba(29,95,82,.16)] transition hover:-translate-y-0.5 hover:bg-[#153f39]">
-              Start with an account <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              {t('Start with an account')} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <a href="#curriculum" className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-[#315d51] transition hover:bg-[#e8e9dd]">
-              Explore the curriculum <ArrowDown className="h-4 w-4" />
+              {t('Explore the curriculum')} <ArrowDown className="h-4 w-4" />
             </a>
           </div>
           <p className="mt-5 text-xs leading-5 text-[#788078]">A paid learning membership · 3,900 ETB / 30 days</p>
@@ -142,11 +147,11 @@ export function PublicLanding() {
           <div className="overflow-hidden rounded-[26px] border border-[#d9d8cc] bg-[#fbf8f0] shadow-[0_10px_35px_rgba(32,50,42,.05)]">
             <div className="flex items-center justify-between border-b border-[#e1dfd5] px-5 py-4 sm:px-7">
               <span className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.17em] text-[#798078]">Learning tracks</span>
-              <span className="text-[10px] text-[#798078]">{String(activeModule + 1).padStart(2, '0')} / {String(COURSE_MODULES.length).padStart(2, '0')}</span>
+              <span className="text-[10px] text-[#798078]">{String(activeModule + 1).padStart(2, '0')} / {String(modules.length).padStart(2, '0')}</span>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-[.78fr_1.22fr]">
               <div className="border-b border-[#e1dfd5] p-3 lg:border-b-0 lg:border-r">
-                {COURSE_MODULES.map((module, index) => {
+                {modules.map((module, index) => {
                   const Icon = topicIcons[index % topicIcons.length];
                   const active = index === activeModule;
                   return <button key={module.id} type="button" onClick={() => { setActiveModule(index); setExpandedChapter(0); }} aria-pressed={active} className={`group flex w-full items-start gap-2.5 rounded-xl px-2.5 py-3 text-left transition sm:items-center sm:gap-3 sm:px-3 sm:py-3.5 ${active ? 'bg-[#e8eee5] text-[#1b5549]' : 'text-[#68736c] hover:bg-[#f1eee5] hover:text-[#1d4038]'}`}>
