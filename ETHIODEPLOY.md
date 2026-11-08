@@ -1,13 +1,13 @@
 # EthioDeploy deployment
 
-This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. EthioDeploy's current Node.js/Replit guide detects the `package.json` scripts and lockfile automatically:
+This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. EthioDeploy uses Nixpacks and the app's `nixpacks.toml` overrides dependency installation to avoid a repeated npm CLI exit during `npm ci`:
 
-- Install: `npm ci`
+- Install: `npm install --no-audit --no-fund --package-lock=true`
 - Build: `npm run build`
 - Start: `npm start`
-- Runtime: Node.js 22 by default
+- Runtime: Node.js 22
 
-Leave the Build and Start command overrides blank unless the EthioDeploy dashboard reports a different requirement. No Dockerfile or EthioDeploy YAML file is needed. `.replit`, `replit.nix`, and `replit.md` are Replit-only configuration.
+The install command retains `package-lock.json`; audit and funding requests are kept out of the install path and should be run separately. Leave Build and Start command overrides blank unless the EthioDeploy dashboard reports a different requirement. `.replit`, `replit.nix`, and `replit.md` are Replit-only configuration.
 
 ## Create the EthioDeploy project
 
