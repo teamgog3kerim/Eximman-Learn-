@@ -25,7 +25,8 @@ const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
 const MainContent: React.FC = () => {
   const {
-    activeNavTab, isAdmin, showPaywallModal, setShowPaywallModal, progressSaveError,
+    activeNavTab, isAdmin, hasFullAccess, hasTrialAccess, trialDaysRemaining,
+    showPaywallModal, setShowPaywallModal, progressSaveError,
     progressSaveNotice, pendingProgressCount, progressSaving, retryProgressSave, discardPendingProgress
   } = useApp();
   const [storageWarning, setStorageWarning] = useState(false);
@@ -52,7 +53,7 @@ const MainContent: React.FC = () => {
       <div className="no-print border-b border-[#ead7bb] bg-[#fff5e8] px-4 py-2.5 text-[#6b4c2b] dark:border-[#574633] dark:bg-[#392e22] dark:text-[#e9c99f]">
         <p className="mx-auto flex max-w-[1440px] items-start gap-2 text-[11px] leading-4 sm:items-center sm:text-xs">
           <Info className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" />
-          <span><strong>Learning workspace.</strong> Study progress is saved to your account and follows you between devices. Telebirr payments are reviewed by the academy admin before subscription access begins.</span>
+          <span><strong>Learning workspace.</strong> {hasFullAccess ? 'Your subscription is active.' : hasTrialAccess ? `Your free trial includes chapters 1 and 2, plus calculators. ${trialDaysRemaining} day${trialDaysRemaining === 1 ? '' : 's'} remaining.` : 'Your free trial has ended. Subscribe to continue with the full courses and calculators.'} Study progress is saved to your account. Payments are reviewed by the academy admin before subscription access begins.</span>
         </p>
       </div>
       {progressSaveError && (
@@ -104,7 +105,11 @@ const MainContent: React.FC = () => {
         {activeNavTab === 'admin' && !isAdmin && <LearningDashboard />}
       </main>
 
-      <SubscriptionModal isOpen={showPaywallModal} onClose={() => setShowPaywallModal(false)} />
+      <SubscriptionModal
+        isOpen={showPaywallModal}
+        trialExpired={!isAdmin && !hasFullAccess && !hasTrialAccess}
+        onClose={() => setShowPaywallModal(false)}
+      />
 
       <footer className="no-print mt-8 border-t academy-line bg-[var(--paper)] py-6">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 text-[11px] sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8">

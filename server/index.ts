@@ -122,7 +122,22 @@ app.use(clerkMiddleware(req => ({
   publishableKey: publishableKeyFromHost(getClerkProxyHost(req) ?? '', process.env.CLERK_PUBLISHABLE_KEY),
 })));
 
-type Identity = { userId: string; email: string; name: string; isAdmin: boolean };
+type Identity = { userId: string; email: string; name: string; isAdmin: boolean; registeredAt: string };
+
+async function getTrialExpiresAt(userId: string): Promise<string> {
+  await pool.query(
+    `INSERT INTO academy_learner_trials (clerk_user_id)
+     VALUES ($1) ON CONFLICT (clerk_user_id) DO NOTHING`,
+    [userId],
+  );
+  const result = await pool.query(
+    `SELECT started_at + interval '3 days' AS trial_expires_at
+     FROM academy_learner_trials WHERE clerk_user_id = $1`,
+    [userId],
+  );
+  return new Date(result.rows[0].trial_expires_at).toISOString();
+}
+
 async function currentIdentity(req: Request): Promise<Identity | null> {
   const { userId } = getAuth(req);
   if (!userId) return null;
@@ -136,6 +151,7 @@ async function currentIdentity(req: Request): Promise<Identity | null> {
     email,
     name: [user.firstName, user.lastName].filter(Boolean).join(' ') || email,
     isAdmin: email === ADMIN_EMAIL,
+    registeredAt: new Date(user.createdAt).toISOString(),
   };
 }
 
@@ -184,16 +200,33 @@ app.get('/api/me', async (_req, res) => {
   );
   const latest = subscription.rows[0];
   const active = latest?.expires_at && new Date(latest.expires_at).getTime() > Date.now();
+  const trialExpiresAt = identity.isAdmin ? identity.registeredAt : await getTrialExpiresAt(identity.userId);
   res.json({
     id: identity.userId,
     email: identity.email,
     fullName: identity.name,
     role: identity.isAdmin ? 'admin' : 'user',
+    registeredAt: identity.registeredAt,
+    trialExpiresAt,
     subscriptionStatus: active ? 'active_paid' : latest ? 'expired' : 'free_trial',
     expiresAt: active ? latest.expires_at : null,
     paymentAmount: active ? SUBSCRIPTION_PRICE_ETB : 0,
   });
 });
+
+async function learnerAccess(identity: Identity) {
+  if (identity.isAdmin) return { full: true, trial: true };
+  const subscription = await pool.query(
+    `SELECT 1 FROM academy_payment_requests
+     WHERE clerk_user_id = $1 AND status = 'approved' AND expires_at > now()
+     LIMIT 1`,
+    [identity.userId],
+  );
+  const full = (subscription.rowCount ?? 0) > 0;
+  const trialExpiresAt = await getTrialExpiresAt(identity.userId);
+  const trial = Date.now() < new Date(trialExpiresAt).getTime();
+  return { full, trial };
+}
 
 app.get('/api/progress', asyncRoute(async (_req, res) => {
   const identity = res.locals.identity as Identity;
@@ -213,6 +246,11 @@ app.put('/api/progress', asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   const progress = validateProgressInput(req.body);
   if (!progress) return res.status(400).json({ error: 'The saved learning progress is not valid.' });
+  const access = await learnerAccess(identity);
+  if (!access.full && (progress.completedChapters.some(id => !['ch-1', 'ch-2'].includes(id)) ||
+    Object.keys(progress.quizScores).some(id => !['ch-1', 'ch-2'].includes(id)) || progress.certificateId)) {
+    return res.status(403).json({ error: 'Your three-day trial includes only chapters 1 and 2. Subscribe to continue learning.' });
+  }
   await pool.query(
     `INSERT INTO academy_learner_progress
        (clerk_user_id, completed_chapters, quiz_scores, certificate_id, certificate_issued_at)
@@ -246,12 +284,16 @@ app.put('/api/progress', asyncRoute(async (req, res) => {
 app.patch('/api/progress', asyncRoute(async (req, res) => {
   const identity = res.locals.identity as Identity;
   const action = req.body?.action;
+  const access = await learnerAccess(identity);
   let result;
 
   if (action === 'chapter') {
     const { chapterId, completed } = req.body;
     if (!COURSE_CHAPTERS_BY_ID.has(chapterId) || typeof completed !== 'boolean') {
       return res.status(400).json({ error: 'Choose a valid course chapter and completion state.' });
+    }
+    if (!access.full && (!access.trial || !['ch-1', 'ch-2'].includes(chapterId))) {
+      return res.status(403).json({ error: 'Your three-day trial includes only chapters 1 and 2. Subscribe to continue learning.' });
     }
     result = await pool.query(
       `UPDATE academy_learner_progress
@@ -273,6 +315,9 @@ app.patch('/api/progress', asyncRoute(async (req, res) => {
       chapter.quiz.length < 1) {
       return res.status(400).json({ error: 'The quiz result is not valid for this chapter.' });
     }
+    if (!access.full && (!access.trial || !['ch-1', 'ch-2'].includes(chapterId))) {
+      return res.status(403).json({ error: 'Your three-day trial includes only chapters 1 and 2. Subscribe to continue learning.' });
+    }
     const date = new Date().toISOString().slice(0, 10);
     result = await pool.query(
       `UPDATE academy_learner_progress
@@ -291,6 +336,7 @@ app.patch('/api/progress', asyncRoute(async (req, res) => {
       [identity.userId, chapterId, score, score / chapter.quiz.length >= 0.6, chapterId, chapter.quiz.length, date],
     );
   } else if (action === 'certificate') {
+    if (!access.full) return res.status(403).json({ error: 'A subscription is required to issue a certificate.' });
     const certificateId = `ET-IMPEX-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`;
     result = await pool.query(
       `UPDATE academy_learner_progress

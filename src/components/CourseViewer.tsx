@@ -260,13 +260,13 @@ export const CourseViewer: React.FC = () => {
               Additional course chapters
             </h3>
             <p className="text-xs text-neutral-300 leading-relaxed">
-              Full course access is not available in this local demo. Payment and registration features have not been connected; do not send money based on this screen.
+              Your 3-day trial includes chapters 1 and 2. Subscribe for 3,900 ETB to unlock all remaining chapters and continue your training.
             </p>
             <button
               onClick={() => setShowPaywallModal(true)}
               className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
-                View demo pricing information
+                View subscription options
             </button>
           </div>
         )}
@@ -426,19 +426,19 @@ export const CourseViewer: React.FC = () => {
             </div>
             <div>
               <span className="text-xs uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400">
-                 Demo preview limitation
+                 Subscription required
               </span>
               <h2 className="text-2xl font-serif-title font-bold text-neutral-900 dark:text-neutral-100 mt-1">
-                Chapter {currentChapter.chapterNumber} is not available in this preview
+                Chapter {currentChapter.chapterNumber} is part of the full curriculum
               </h2>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-lg mx-auto mt-2">
-                This demo preview includes the free chapters. No checkout, subscription, or secure account service is connected here.
+                The free trial includes chapters 1 and 2 for the first three days after signup. Subscribe to unlock this chapter and continue learning.
               </p>
             </div>
 
             <div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-xl max-w-md mx-auto text-left text-xs space-y-2 border border-neutral-200 dark:border-neutral-700">
-              <div className="font-semibold text-neutral-800 dark:text-neutral-200">
-                Additional content in the imported project:
+                <div className="font-semibold text-neutral-800 dark:text-neutral-200">
+                Included with full access:
               </div>
               <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -462,7 +462,7 @@ export const CourseViewer: React.FC = () => {
               onClick={() => setShowPaywallModal(true)}
               className="px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl transition-colors shadow-sm"
             >
-              View demo pricing information
+              View subscription options
             </button>
           </div>
         ) : (

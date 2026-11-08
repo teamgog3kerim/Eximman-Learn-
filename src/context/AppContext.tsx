@@ -27,6 +27,9 @@ interface AppContextType {
   loginAsAdmin: () => void;
   isAdmin: boolean;
   hasFullAccess: boolean;
+  hasTrialAccess: boolean;
+  trialExpiresAt: string;
+  trialDaysRemaining: number;
   activeNavTab: NavTabType;
   setActiveNavTab: (tab: NavTabType) => void;
   selectedChapterId: string;
@@ -353,6 +356,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
   };
 
   const hasFullAccess = isAdmin || isSubscriptionValid();
+  const trialExpiresAt = currentUser.trialExpiresAt ||
+    new Date(new Date(currentUser.registeredAt).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const [clockNow, setClockNow] = useState(Date.now());
+  const hasTrialAccess = isAdmin || (Number.isFinite(Date.parse(trialExpiresAt)) &&
+    Date.parse(trialExpiresAt) > clockNow);
+  const trialDaysRemaining = Math.max(0, Math.ceil((Date.parse(trialExpiresAt) - clockNow) / (24 * 60 * 60 * 1000)));
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClockNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin || hasFullAccess || hasTrialAccess) return;
+    setShowPaywallModal(true);
+    setActiveNavTab('subscription');
+  }, [hasFullAccess, hasTrialAccess, isAdmin]);
+
+  const navigateToTab = (tab: NavTabType) => {
+    const calculatorTabs: NavTabType[] = ['landed_cost', 'lc_calculator', 'tax_calculator'];
+    if (!isAdmin && !hasFullAccess && !hasTrialAccess && calculatorTabs.includes(tab)) {
+      setActiveNavTab('subscription');
+      setShowPaywallModal(true);
+      return;
+    }
+    setActiveNavTab(tab);
+  };
 
   // Progress logic
   const completedChapters = [...new Set(progress?.completedChapters || [])].filter(id => CHAPTER_IDS.has(id));
@@ -558,8 +588,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode; profile: UserPro
         loginAsAdmin,
         isAdmin,
         hasFullAccess,
+        hasTrialAccess,
+        trialExpiresAt,
+        trialDaysRemaining,
         activeNavTab,
-        setActiveNavTab,
+        setActiveNavTab: navigateToTab,
         selectedChapterId,
         setSelectedChapterId,
         showPaywallModal,

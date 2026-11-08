@@ -5,9 +5,10 @@ import { useApp } from '../context/AppContext';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  trialExpired?: boolean;
 }
 
-export const SubscriptionModal: React.FC<Props> = ({ isOpen, onClose }) => {
+export const SubscriptionModal: React.FC<Props> = ({ isOpen, onClose, trialExpired = false }) => {
   const { setActiveNavTab } = useApp();
   if (!isOpen) return null;
 
@@ -16,16 +17,16 @@ export const SubscriptionModal: React.FC<Props> = ({ isOpen, onClose }) => {
       <section role="dialog" aria-modal="true" aria-labelledby="payment-title" className="w-full max-w-md space-y-4 rounded-2xl border academy-line academy-paper p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.14em] academy-accent">30-day learner subscription</p>
-            <h2 id="payment-title" className="mt-1 font-serif-title text-2xl font-bold">Unlock the full curriculum</h2>
+            <p className="text-xs font-bold uppercase tracking-[.14em] academy-accent">{trialExpired ? 'Free trial complete' : '30-day learner subscription'}</p>
+            <h2 id="payment-title" className="mt-1 font-serif-title text-2xl font-bold">{trialExpired ? 'Continue your learning' : 'Unlock the full curriculum'}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/10"><X className="h-5 w-5" /></button>
+          {!trialExpired && <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/10"><X className="h-5 w-5" /></button>}
         </div>
         <div role="note" className="flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
           <CreditCard className="mt-1 h-4 w-4 shrink-0" />
-          <p>Pay 3,900 ETB with Telebirr or CBE, then submit your transaction reference. The academy admin will verify it and approve 30 days of access.</p>
+          <p>{trialExpired ? 'Your 3-day trial has ended. To continue the remaining courses and use the trade calculators, subscribe for 3,900 ETB. Pay with Telebirr or CBE and submit your transaction reference for admin review.' : 'Pay 3,900 ETB with Telebirr or CBE, then submit your transaction reference. The academy admin will verify it and approve 30 days of access.'}</p>
         </div>
-        <button type="button" onClick={() => { onClose(); setActiveNavTab('subscription'); }} className="min-h-11 w-full rounded-xl bg-[#174f49] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#12413c]">Continue to payment instructions</button>
+        <button type="button" onClick={() => { onClose(); setActiveNavTab('subscription'); }} className="min-h-11 w-full rounded-xl bg-[#174f49] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#12413c]">Proceed to subscription</button>
       </section>
     </div>
   );

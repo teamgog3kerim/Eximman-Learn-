@@ -218,7 +218,7 @@ export const CostBreakdownSheet: React.FC = () => {
           <div className="flex items-center gap-3">
             <Info className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0" />
             <div className="text-xs text-amber-900 dark:text-amber-200">
-              <span className="font-semibold">Interactive Calculation Preview:</span> You can test this live calculator. Subscribe for 3,900 ETB to unlock advanced exports, save unlimited declarations, and access Modules 2–6!
+              <span className="font-semibold">3-day trial access:</span> Use the trade calculators during your trial. Subscribe for 3,900 ETB to keep access and unlock the complete academy.
             </div>
           </div>
           <button
