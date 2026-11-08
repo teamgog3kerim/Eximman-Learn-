@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Check, Copy } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 type RequestRow = {
@@ -18,6 +19,7 @@ export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode 
   const [users, setUsers] = useState<{ id: string; email: string; name: string; role: string; subscriptionStatus: string; expiresAt?: string }[]>([]);
   const [reference, setReference] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'telebirr' | 'cbe'>('telebirr');
+  const [copiedAccount, setCopiedAccount] = useState<'telebirr' | 'cbe' | null>(null);
   const [reason, setReason] = useState<Record<string, string>>({});
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -45,6 +47,17 @@ export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode 
   }, [adminMode]);
 
   useEffect(() => { void load(); }, [load]);
+
+  const copyAccountNumber = async (method: 'telebirr' | 'cbe', number: string) => {
+    try {
+      await navigator.clipboard.writeText(number);
+      setError('');
+      setCopiedAccount(method);
+      window.setTimeout(() => setCopiedAccount(current => current === method ? null : current), 1800);
+    } catch {
+      setError('Could not copy the account number. Please select and copy it manually.');
+    }
+  };
 
   const review = async (id: string, action: 'approved' | 'rejected') => {
     setBusy(true);
@@ -146,9 +159,9 @@ export const PaymentWorkspace: React.FC<{ adminMode?: boolean }> = ({ adminMode 
           </select>
         </label>
         {paymentMethod === 'cbe'
-          ? <dl className="rounded-xl bg-[#e6f1ed] p-4 text-sm dark:bg-[#263a35]"><dt className="text-xs academy-muted">CBE account number</dt><dd className="mt-1 font-bold tracking-wide">{account.cbeAccountNumber || '1000342413904'}</dd></dl>
+          ? <dl className="rounded-xl bg-[#e6f1ed] p-4 text-sm dark:bg-[#263a35]"><div className="flex items-center justify-between gap-3"><div className="min-w-0"><dt className="text-xs academy-muted">CBE account number</dt><dd className="mt-1 break-all font-bold tracking-wide">{account.cbeAccountNumber || '1000342413904'}</dd></div><button type="button" onClick={() => void copyAccountNumber('cbe', account.cbeAccountNumber || '1000342413904')} aria-label={copiedAccount === 'cbe' ? 'CBE account number copied' : 'Copy CBE account number'} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border academy-line px-3 text-xs font-bold transition hover:bg-white/70 dark:hover:bg-white/10">{copiedAccount === 'cbe' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}<span>{copiedAccount === 'cbe' ? 'Copied' : 'Copy'}</span></button></div></dl>
           : account.telebirrAccountNumber
-            ? <dl className="grid gap-3 rounded-xl bg-[#e6f1ed] p-4 text-sm dark:bg-[#263a35] sm:grid-cols-2"><div><dt className="text-xs academy-muted">Account name</dt><dd className="mt-1 font-bold">{account.telebirrAccountName}</dd></div><div><dt className="text-xs academy-muted">Telebirr number</dt><dd className="mt-1 font-bold">{account.telebirrAccountNumber}</dd></div></dl>
+            ? <dl className="rounded-xl bg-[#e6f1ed] p-4 text-sm dark:bg-[#263a35]"><div className="flex items-center justify-between gap-3"><div className="min-w-0"><dt className="text-xs academy-muted">Telebirr number</dt><dd className="mt-1 break-all font-bold">{account.telebirrAccountNumber}</dd></div><button type="button" onClick={() => void copyAccountNumber('telebirr', account.telebirrAccountNumber)} aria-label={copiedAccount === 'telebirr' ? 'Telebirr number copied' : 'Copy Telebirr number'} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border academy-line px-3 text-xs font-bold transition hover:bg-white/70 dark:hover:bg-white/10">{copiedAccount === 'telebirr' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}<span>{copiedAccount === 'telebirr' ? 'Copied' : 'Copy'}</span></button></div></dl>
             : <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">The admin has not set the Telebirr recipient yet. Choose CBE or check back later.</p>}
         <form onSubmit={submit} className="space-y-4">
           <div><h2 className="font-serif-title text-xl font-bold">2. Submit the transaction reference</h2><p className="mt-1 text-sm academy-muted">Enter the reference from your Telebirr or CBE payment confirmation. No screenshot is needed.</p></div>
