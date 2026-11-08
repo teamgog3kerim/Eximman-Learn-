@@ -53,7 +53,6 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
               </Link>
             </div>
           </div>
-          <p className="mt-4 text-center text-[11px] leading-5 text-[#7a8179]">If no account options appear, enable Google under Replit’s Users &amp; Auth settings, then reload this page.</p>
         </section>
       </div>
 
