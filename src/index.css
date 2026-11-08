@@ -91,6 +91,32 @@
 @keyframes landing-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 .academy-enter { animation: academy-enter .42s ease both; }
 @keyframes academy-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 480px) {
+  .cl-cardBox {
+    box-sizing: border-box;
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+  .cl-scrollBox {
+    max-height: calc(100dvh - 48px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  .cl-scrollBox [class*="profileSectionContentRow"] {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    min-width: 0;
+  }
+  .cl-scrollBox [class*="profileSectionContentRowTitle"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+  .cl-scrollBox [class*="profileSectionContentRowValue"] {
+    max-width: 100% !important;
+    overflow-wrap: anywhere;
+  }
+}
 ::-webkit-scrollbar { width: 7px; height: 7px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #9daea5; border-radius: 999px; }
