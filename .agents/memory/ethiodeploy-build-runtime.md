@@ -20,3 +20,9 @@ The repository's valid `nixpacks.toml` install override was present in the exact
 **Why:** Local configuration alone did not change the remote build plan, so another commit with the same TOML would not address the failure.
 
 **How to apply:** Set the build-time `NIXPACKS_INSTALL_CMD` override (or the provider's equivalent) to `npm install --no-audit --no-fund --package-lock=true`, then verify the generated plan says `npm install` before retrying. Keep security auditing as a separate check.
+
+EthioDeploy's explicit install-command setting successfully changed the plan to `npm install`, but both `npm ci` and `npm install` have then exited after roughly 72 seconds with only npm's generic “Exit handler never called” output. The logs also warn that npm's production setting is enabled.
+
+**Why:** Changing install subcommands alone did not resolve the remote failure, and production-mode omission would also exclude Vite/esbuild needed by the build.
+
+**How to apply:** Include `--include=dev` in the install command so the build tools are installed. If the generic exit repeats, use `--verbose` to capture the last npm actions and obtain the remote debug log; do not infer a package-specific failure from the generic message.
