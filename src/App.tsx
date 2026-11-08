@@ -114,7 +114,7 @@ const MainContent: React.FC = () => {
       <footer className="no-print mt-8 border-t academy-line bg-[var(--paper)] py-6">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 text-[11px] sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8">
           <div>
-            <p className="font-serif-title text-sm font-extrabold">Ethiopian Import Export & Logistics Academy</p>
+            <p className="font-serif-title text-sm font-extrabold">Ethio Export-Import and Logistics Learning Academy</p>
             <p className="mt-1 academy-muted">A practical learning workspace for trade and logistics professionals.</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 academy-muted">

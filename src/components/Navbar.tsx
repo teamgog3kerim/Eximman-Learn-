@@ -65,8 +65,8 @@ export const Navbar: React.FC = () => {
               <span className="font-serif-title text-sm font-extrabold tracking-[-.06em]">ET</span>
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-serif-title text-[15px] font-extrabold tracking-[-.035em] sm:text-base">Ethio-ImpEx Academy</span>
-              <span className="mt-0.5 block text-[9px] font-bold uppercase tracking-[.15em] academy-muted">Trade learning workspace</span>
+              <span className="block truncate font-serif-title text-[15px] font-extrabold tracking-[-.035em] sm:text-base">Ethio Export-Import and Logistics</span>
+              <span className="mt-0.5 block text-[9px] font-bold uppercase tracking-[.15em] academy-muted">LEARNING ACADEMY</span>
             </span>
           </button>
 

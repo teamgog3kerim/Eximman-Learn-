@@ -15,7 +15,7 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
       <header className="mx-auto flex max-w-[1240px] items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
         <Link href="/" className="flex items-center gap-3">
           <img src="/logo.svg" alt="" className="h-10 w-10 rounded-xl" />
-          <span><span className="block text-[13px] font-bold text-[#193a34]">Ethio-ImpEx</span><span className="block text-[10px] font-semibold uppercase tracking-[.16em] text-[#6d766d]">Academy</span></span>
+          <span><span className="block text-[13px] font-bold text-[#193a34]">Ethio Export-Import and Logistics</span><span className="block text-[10px] font-semibold uppercase tracking-[.16em] text-[#6d766d]">LEARNING ACADEMY</span></span>
         </Link>
         <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#52665c] transition hover:text-[#a45e2f]"><ArrowLeft className="h-4 w-4" /> Back to overview</Link>
       </header>
@@ -23,7 +23,7 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
         <section className="relative overflow-hidden rounded-[26px] bg-[#1a433b] p-7 text-[#f8f3e8] sm:p-10 lg:min-h-[540px] lg:p-12">
           <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-[#e2b57b]/20" />
           <div className="relative">
-            <p className="font-mono-numbers text-[10px] uppercase tracking-[.2em] text-[#e7b579]">Ethio-ImpEx Academy</p>
+            <p className="font-mono-numbers text-[10px] uppercase tracking-[.2em] text-[#e7b579]">Ethio Export-Import and Logistics Learning Academy</p>
             <h1 className="mt-6 max-w-lg font-serif-title text-4xl leading-[1.04] tracking-[-.04em] sm:text-5xl">{signUp ? 'Make trade knowledge part of your toolkit.' : 'Pick up where your work left off.'}</h1>
             <p className="mt-5 max-w-md text-sm leading-7 text-white/70">{signUp ? 'Set up an account, then explore practical learning on Ethiopian trade rules, import banking, logistics, customs and export procedures.' : 'Sign in to return to your learning workspace and continue with your saved progress.'}</p>
             <div className="mt-9 border-t border-white/15 pt-6">

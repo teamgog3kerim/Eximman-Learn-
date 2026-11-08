@@ -103,7 +103,7 @@ export const CourseViewer: React.FC = () => {
                 Course Syllabus
               </span>
               <h2 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                Ethiopia Import & Export Academy
+                Ethio Export-Import and Logistics Learning Academy
               </h2>
             </div>
             <span className="text-xs font-mono font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded">
