@@ -511,7 +511,35 @@ async function start() {
     app.use(express.static(path.resolve(import.meta.dirname, '../dist')));
     app.get('*', (_req, res) => res.sendFile(path.resolve(import.meta.dirname, '../dist/index.html')));
   }
-  app.listen(PORT, '0.0.0.0', () => console.log(`Academy server listening on ${PORT}`));
+  const server = app.listen(PORT, '0.0.0.0', () => console.log(`Academy server listening on ${PORT}`));
+  let shuttingDown = false;
+  const shutdown = (signal: NodeJS.Signals) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`${signal} received; closing the academy server.`);
+
+    const timeout = setTimeout(() => {
+      console.error('Graceful shutdown timed out.');
+      process.exit(1);
+    }, 10_000);
+    timeout.unref();
+
+    server.close(() => {
+      void pool.end()
+        .then(() => {
+          clearTimeout(timeout);
+          process.exitCode = 0;
+        })
+        .catch(error => {
+          clearTimeout(timeout);
+          console.error('Database pool failed to close cleanly.', error);
+          process.exitCode = 1;
+        });
+    });
+  };
+
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
 }
 
 start().catch(error => {
