@@ -103,16 +103,16 @@
     overflow-x: hidden !important;
     overflow-y: auto !important;
   }
-  .cl-scrollBox [class*="profileSectionContentRow"] {
+  .cl-profileSectionContentRow {
     align-items: flex-start !important;
     flex-wrap: wrap !important;
     min-width: 0;
   }
-  .cl-scrollBox [class*="profileSectionContentRowTitle"] {
+  .cl-profileSectionContentRowTitle {
     flex: 0 0 100% !important;
     max-width: 100% !important;
   }
-  .cl-scrollBox [class*="profileSectionContentRowValue"] {
+  .cl-profileSectionContentRowValue {
     max-width: 100% !important;
     overflow-wrap: anywhere;
   }

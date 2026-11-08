@@ -29,6 +29,7 @@ const clerkAppearance = {
     cardBox: 'bg-[#fffefa] rounded-2xl w-[440px] max-w-full overflow-hidden dark:bg-[#1e2926]',
     card: '!shadow-none !border-0 !bg-transparent !rounded-none',
     footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
+    navbarButton__security: 'hidden',
     headerTitle: 'text-[#202b29] dark:text-[#edf1eb]',
     headerSubtitle: 'text-[#697873] dark:text-[#a0ada7]',
     socialButtonsBlockButtonText: 'text-[#202b29] dark:text-[#edf1eb]',
