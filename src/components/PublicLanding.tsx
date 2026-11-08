@@ -7,10 +7,10 @@ const topicIcons = [Landmark, FileCheck2, Ship, Route, BookOpen, BadgeCheck];
 
 function Brand() {
   return (
-    <Link href="/" aria-label="Ethio-ImpEx Academy home" className="flex items-center gap-3">
+    <Link href="/" aria-label="Ethio Export-Import and Logistics Academy home" className="flex items-center gap-3">
       <img src="/logo.svg" alt="" className="h-10 w-10 rounded-xl" />
       <span className="leading-tight">
-        <span className="block text-[13px] font-bold tracking-tight text-[#193a34]">Ethio-ImpEx</span>
+        <span className="block text-[13px] font-bold tracking-tight text-[#193a34]">Ethio Export-Import and Logistics</span>
         <span className="block text-[10px] font-semibold uppercase tracking-[.16em] text-[#6d766d]">Academy</span>
       </span>
     </Link>
