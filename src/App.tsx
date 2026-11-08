@@ -20,7 +20,8 @@ import { ResourceLibrary } from './components/ResourceLibrary';
 import { RecordsTracker } from './components/RecordsTracker';
 import { CertificationView } from './components/CertificationView';
 import { SubscriptionModal } from './components/SubscriptionModal';
-import { AlertTriangle, Info, Send } from 'lucide-react';
+import { TelegramChannelCTA } from './components/TelegramChannelCTA';
+import { AlertTriangle, Info } from 'lucide-react';
 
 const toolTabs = ['landed_cost', 'lc_calculator', 'tax_calculator'];
 
@@ -113,26 +114,18 @@ const MainContent: React.FC = () => {
         onClose={() => setShowPaywallModal(false)}
       />
 
-      <footer className="no-print mt-8 border-t academy-line bg-[var(--paper)] py-6">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 text-[11px] sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8">
+      <footer className="no-print mt-8 border-t academy-line bg-[var(--paper)]">
+        <div className="mx-auto grid max-w-[1440px] gap-5 px-4 py-7 text-[11px] sm:grid-cols-2 sm:px-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(150px,.65fr)_minmax(0,1.35fr)] lg:items-center xl:px-8">
           <div>
             <p className="font-serif-title text-sm font-extrabold">Ethio Export-Import and Logistics Learning Academy</p>
             <p className="mt-1 academy-muted">A practical learning workspace for trade and logistics professionals.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 academy-muted">
-            <span>Business pricing: 3,900 ETB / 30 days</span>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <a
-                href="https://t.me/eximmanlearn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-9 items-center gap-2 rounded-full bg-[#1d5f52] px-3.5 text-[11px] font-bold text-white transition hover:bg-[#153f39] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d5f52]"
-              >
-                <Send className="h-3.5 w-3.5" aria-hidden="true" />
-                {t('Join our channel')}
-              </a>
-              <span className="max-w-[300px] text-[10px] leading-4">{t('Business news, announcements, help and support from our team, and more.')}</span>
-            </div>
+          <div className="border-t academy-line pt-4 sm:border-t-0 sm:pt-0 lg:border-l lg:pl-5">
+            <p className="text-[10px] font-bold uppercase tracking-[.14em] academy-brand">{t('Membership')}</p>
+            <p className="mt-1 font-semibold">3,900 ETB <span className="font-normal academy-muted">/ 30 days</span></p>
+          </div>
+          <div className="border-t academy-line pt-4 sm:col-span-2 lg:col-span-1 lg:border-l lg:pt-0 lg:pl-5">
+            <TelegramChannelCTA />
           </div>
         </div>
       </footer>

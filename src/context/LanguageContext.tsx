@@ -320,6 +320,7 @@ const AMHARIC_UI: Record<string, string> = {
   'Djibouti & Regional Corridors, Demurrage & Dry Ports': 'የጅቡቲ እና የክልል ኮሪደሮች፣ የዘግይቶ ቆይታ ክፍያ እና ደረቅ ወደቦች',
   'Join our channel': 'የቴሌግራም ቻናላችንን ይቀላቀሉ',
   'Business news, announcements, help and support from our team, and more.': 'የንግድ ዜናዎች፣ ማስታወቂያዎች፣ ከቡድናችን እገዛና ድጋፍ እና ሌሎችም።',
+  'Community updates': 'የማህበረሰብ ዜናዎች',
 };
 
 type LanguageContextValue = {

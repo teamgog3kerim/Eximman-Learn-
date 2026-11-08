@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
-import { ArrowDown, ArrowRight, ArrowUpRight, BadgeCheck, BookOpen, ChevronRight, FileCheck2, Landmark, Menu, Route, Send, Ship, X } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, BadgeCheck, BookOpen, ChevronRight, FileCheck2, Landmark, Menu, Route, Ship, X } from 'lucide-react';
 import { useLanguage, useLocalizedCourseModules } from '../context/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
+import { TelegramChannelCTA } from './TelegramChannelCTA';
 
 const topicIcons = [Landmark, FileCheck2, Ship, Route, BookOpen, BadgeCheck];
 
@@ -244,18 +245,17 @@ export function PublicLanding() {
       </section>
 
       <footer className="border-t border-[#d9d8cc]">
-        <div className="mx-auto flex max-w-[1320px] flex-col gap-4 px-5 py-7 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12">
-          <Brand />
-          <p className="text-xs leading-5 text-[#788078]">{t('Practical learning for Ethiopian import-export and logistics.')}</p>
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
-            <div className="flex items-center gap-5 text-xs font-semibold text-[#52665c]"><Link href="/sign-in" className="hover:text-[#a45e2f]">Sign in</Link><Link href="/sign-up" className="hover:text-[#a45e2f]">Create account</Link></div>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <a href="https://t.me/eximmanlearn" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-2 rounded-full bg-[#1d5f52] px-3.5 text-[11px] font-bold text-white transition hover:bg-[#153f39] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d5f52]">
-                <Send className="h-3.5 w-3.5" aria-hidden="true" />
-                {t('Join our channel')}
-              </a>
-              <span className="max-w-[300px] text-[10px] leading-4 text-[#788078]">{t('Business news, announcements, help and support from our team, and more.')}</span>
-            </div>
+        <div className="mx-auto grid max-w-[1320px] gap-6 px-5 py-7 sm:grid-cols-2 sm:px-8 lg:grid-cols-[minmax(0,1fr)_auto_minmax(340px,1.15fr)] lg:items-center lg:px-12">
+          <div>
+            <Brand />
+            <p className="mt-3 max-w-sm text-xs leading-5 text-[#788078]">{t('Practical learning for Ethiopian import-export and logistics.')}</p>
+          </div>
+          <nav aria-label="Footer" className="flex items-center gap-5 text-xs font-semibold text-[#52665c]">
+            <Link href="/sign-in" className="transition hover:text-[#a45e2f]">Sign in</Link>
+            <Link href="/sign-up" className="transition hover:text-[#a45e2f]">Create account</Link>
+          </nav>
+          <div className="border-t border-[#d9d8cc] pt-5 sm:col-span-2 lg:col-span-1 lg:border-l lg:border-t-0 lg:py-1 lg:pl-6">
+            <TelegramChannelCTA tone="public" />
           </div>
         </div>
       </footer>
