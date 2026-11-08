@@ -1,13 +1,13 @@
 # EthioDeploy deployment
 
-This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. The intended Nixpacks install command is `npm install --include=dev --no-audit --no-fund --package-lock=true`, which retains the checked-in lockfile and installs Vite/esbuild build dependencies. EthioDeploy's Build & Deploy settings override the repository config, so verify the command shown in the generated Nixpacks plan.
+This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. Use `npm install --no-audit --no-fund --package-lock=true` as the install command. The build-time CLI `esbuild` is a regular dependency so it is installed even when EthioDeploy sets `NODE_ENV=production`; Vite and its build plugins are also listed as regular dependencies. EthioDeploy's Build & Deploy settings override the repository config, so verify the command shown in the generated Nixpacks plan.
 
-In EthioDeploy's **Build & Deploy → Install Command** field, use `npm install --include=dev --no-audit --no-fund --package-lock=true`. A recent build used the correct command but still exited after about 72 seconds with npm's generic “Exit handler never called” error; the available output did not include the underlying npm debug trace. If this repeats, request the full npm debug log from EthioDeploy before changing dependencies. The Docker warning about `$NIXPACKS_PATH` is separate from this npm failure.
+In EthioDeploy's **Build & Deploy → Install Command** field, set `npm install --no-audit --no-fund --package-lock=true`. A recent log showed the older command without `--include=dev`; this project now keeps the required `esbuild` CLI in regular dependencies, so the production-mode install includes it. The same log also ended with npm's generic “Exit handler never called” error, which does not reveal npm's underlying failure. If that npm error persists with this install command, obtain the complete npm debug log from the build worker before changing more dependencies. The Docker warning about `$NIXPACKS_PATH` is separate.
 - Build: `npm run build`
 - Start: `npm start`
 - Runtime: Node.js 22
 
-The install command retains `package-lock.json`; audit and funding requests are kept out of the install path and should be run separately. Leave Build and Start command overrides blank unless the EthioDeploy dashboard reports a different requirement. `.replit`, `replit.nix`, and `replit.md` are Replit-only configuration.
+The install command retains `package-lock.json`; audit and funding requests are kept out of the install path and should be run separately. Set Build to `npm run build` and Start to `npm start`. Verify the generated Nixpacks plan contains the exact install command above; the dashboard override takes precedence over `nixpacks.toml`. `.replit`, `replit.nix`, and `replit.md` are Replit-only configuration.
 
 ## Create the EthioDeploy project
 
