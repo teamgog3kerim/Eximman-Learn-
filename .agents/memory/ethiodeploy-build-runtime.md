@@ -14,3 +14,9 @@ In a later deployment attempt, `npm ci` still exited with npm's generic “Exit 
 **Why:** Repeated remote failures that cannot be reproduced with the same runtime and lockfile are not evidence for another dependency edit; the npm debug log or build-worker diagnostics are needed.
 
 **How to apply:** If this pattern recurs, stop changing the dependency tree and obtain the build container's npm debug log or provider-side timeout/resource information.
+
+As an alternate workaround, a Nixpacks install-phase override using `npm install --no-audit --no-fund --package-lock=true` passed a fresh local install with the same Node/npm versions. Its success on EthioDeploy remains unverified until a new remote build runs.
+
+**Why:** This preserves the checked-in lockfile while avoiding the failing `npm ci` command; it is a diagnostic workaround, not proof of the provider-side cause.
+
+**How to apply:** Use this override only after verifying the exact generated Nixpacks phase and the resulting remote build; keep security auditing as a separate check.
