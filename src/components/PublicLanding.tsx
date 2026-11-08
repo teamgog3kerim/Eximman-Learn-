@@ -144,15 +144,15 @@ export function PublicLanding() {
               <span className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.17em] text-[#798078]">Learning tracks</span>
               <span className="text-[10px] text-[#798078]">{String(activeModule + 1).padStart(2, '0')} / {String(COURSE_MODULES.length).padStart(2, '0')}</span>
             </div>
-            <div className="grid md:grid-cols-[.78fr_1.22fr]">
-              <div className="border-b border-[#e1dfd5] p-3 md:border-b-0 md:border-r">
+            <div className="grid grid-cols-1 lg:grid-cols-[.78fr_1.22fr]">
+              <div className="border-b border-[#e1dfd5] p-3 lg:border-b-0 lg:border-r">
                 {COURSE_MODULES.map((module, index) => {
                   const Icon = topicIcons[index % topicIcons.length];
                   const active = index === activeModule;
-                  return <button key={module.id} type="button" onClick={() => { setActiveModule(index); setExpandedChapter(0); }} aria-pressed={active} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left transition ${active ? 'bg-[#e8eee5] text-[#1b5549]' : 'text-[#68736c] hover:bg-[#f1eee5] hover:text-[#1d4038]'}`}>
+                  return <button key={module.id} type="button" onClick={() => { setActiveModule(index); setExpandedChapter(0); }} aria-pressed={active} className={`group flex w-full items-start gap-2.5 rounded-xl px-2.5 py-3 text-left transition sm:items-center sm:gap-3 sm:px-3 sm:py-3.5 ${active ? 'bg-[#e8eee5] text-[#1b5549]' : 'text-[#68736c] hover:bg-[#f1eee5] hover:text-[#1d4038]'}`}>
                     <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${active ? 'bg-[#1d5f52] text-white' : 'bg-[#eeece2] text-[#92734f]'}`}><Icon className="h-4 w-4" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xs font-bold leading-4">{module.title}</span><span className="mt-1 block truncate text-[10px] text-current/70">{module.subtitle}</span></span>
-                    <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${active ? 'translate-x-0.5' : 'opacity-50'}`} />
+                    <span className="min-w-0 flex-1"><span className="block break-words text-[12px] font-bold leading-4 sm:text-xs">{module.title}</span><span className="mt-1 block line-clamp-2 whitespace-normal break-words text-[10px] leading-4 text-current/70">{module.subtitle}</span></span>
+                    <ChevronRight className={`mt-1 h-4 w-4 shrink-0 transition-transform sm:mt-0 ${active ? 'translate-x-0.5' : 'opacity-50'}`} />
                   </button>;
                 })}
               </div>
