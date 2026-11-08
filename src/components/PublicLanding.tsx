@@ -19,6 +19,7 @@ function Brand() {
 }
 
 function CorridorIllustration() {
+  const { t } = useLanguage();
   return (
     <div className="relative min-h-[330px] overflow-hidden rounded-[26px] border border-white/15 bg-[#163e38] p-5 text-[#f4efdf] sm:min-h-[375px] sm:p-7" aria-label="Illustration of the Addis Ababa to Djibouti trade corridor">
       <div className="absolute inset-0 opacity-25" style={{ backgroundImage: 'linear-gradient(rgba(236,227,205,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(236,227,205,.16) 1px, transparent 1px)', backgroundSize: '35px 35px' }} />
@@ -33,8 +34,8 @@ function CorridorIllustration() {
       <div className="relative z-10 flex h-full min-h-[285px] flex-col justify-between sm:min-h-[325px]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="font-mono-numbers text-[10px] uppercase tracking-[.2em] text-[#e8bb83]">A working route, not a theory</p>
-            <p className="mt-2 max-w-[220px] font-serif-title text-2xl leading-tight sm:text-3xl">From inland decisions to port-side movement.</p>
+            <p className="font-mono-numbers text-[10px] uppercase tracking-[.2em] text-[#e8bb83]">{t('A working route, not a theory')}</p>
+            <p className="mt-2 max-w-[220px] font-serif-title text-2xl leading-tight sm:text-3xl">{t('From inland decisions to port-side movement.')}</p>
           </div>
           <span className="rounded-full border border-white/20 px-3 py-1.5 text-[10px] uppercase tracking-[.14em] text-white/70">Trade route / 01</span>
         </div>
@@ -125,7 +126,7 @@ export function PublicLanding() {
 
       <section className="border-y border-[#d9d8cc] bg-[#e9e6da]">
         <div className="mx-auto grid max-w-[1320px] gap-7 px-5 py-8 sm:px-8 md:grid-cols-[.65fr_1.35fr] md:items-center lg:px-12">
-          <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#966239]">The work behind the shipment</p>
+          <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#966239]">{t('The work behind the shipment')}</p>
           <div className="grid gap-4 sm:grid-cols-3">
             <p className="text-sm leading-6 text-[#4f6158]"><b className="text-[#1d4038]">Rules & records</b><br />Trade licenses, ESW declarations, and compliance steps.</p>
             <p className="text-sm leading-6 text-[#4f6158]"><b className="text-[#1d4038]">Money & timing</b><br />L/C workflows, forex exposure, and payment stages.</p>
@@ -138,7 +139,7 @@ export function PublicLanding() {
         <div className="grid gap-8 lg:grid-cols-[.78fr_1.22fr] lg:gap-16">
           <div className="landing-rise">
             <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#a45e2f]">A curriculum shaped around the job</p>
-            <h2 className="mt-5 max-w-lg font-serif-title text-4xl leading-[1.02] tracking-[-.04em] text-[#193a34] sm:text-5xl">Start with the decision. Follow it to delivery.</h2>
+            <h2 className="mt-5 max-w-lg font-serif-title text-4xl leading-[1.02] tracking-[-.04em] text-[#193a34] sm:text-5xl">{t('Start with the decision. Follow it to delivery.')}</h2>
             <p className="mt-5 max-w-md text-sm leading-7 text-[#647169]">Explore the real subject areas in the academy curriculum. Select a learning track to preview its chapters.</p>
             <Link href="/sign-up" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#1d5f52] hover:text-[#a45e2f]">
               Create your learner account <ArrowUpRight className="h-4 w-4" />
@@ -197,7 +198,7 @@ export function PublicLanding() {
         <div className="relative mx-auto grid max-w-[1320px] gap-12 px-5 py-20 sm:px-8 sm:py-24 lg:grid-cols-[.8fr_1.2fr] lg:items-center lg:px-12">
           <div>
             <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#e7b579]">Learn the sequence, then the judgment</p>
-            <h2 className="mt-5 max-w-lg font-serif-title text-4xl leading-[1.03] tracking-[-.04em] sm:text-5xl">Trade knowledge is a chain of decisions.</h2>
+            <h2 className="mt-5 max-w-lg font-serif-title text-4xl leading-[1.03] tracking-[-.04em] sm:text-5xl">{t('Trade knowledge is a chain of decisions.')}</h2>
             <p className="mt-5 max-w-md text-sm leading-7 text-white/70">Follow the handoffs between a trader, bank, regulator, customs desk and logistics partner—so the documents and the movement make sense together.</p>
             <Link href="/sign-up" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#e7b579] px-5 py-3 text-sm font-bold text-[#203d35] transition hover:-translate-y-0.5 hover:bg-[#f0c792]">Build your foundation <ArrowRight className="h-4 w-4" /></Link>
           </div>
@@ -219,7 +220,7 @@ export function PublicLanding() {
       <section className="mx-auto grid max-w-[1320px] gap-8 px-5 py-20 sm:px-8 sm:py-24 lg:grid-cols-[1fr_.82fr] lg:items-center lg:gap-20 lg:px-12">
         <div>
           <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#a45e2f]">Built for the people doing the work</p>
-          <h2 className="mt-5 max-w-xl font-serif-title text-4xl leading-[1.02] tracking-[-.04em] text-[#193a34] sm:text-5xl">Useful whether you’re planning your first shipment or handling the next one.</h2>
+          <h2 className="mt-5 max-w-xl font-serif-title text-4xl leading-[1.02] tracking-[-.04em] text-[#193a34] sm:text-5xl">{t('Useful whether you’re planning your first shipment or handling the next one.')}</h2>
         </div>
         <div className="space-y-5 border-l-2 border-[#d2aa7b] pl-5 sm:pl-7">
           <p className="text-sm leading-7 text-[#596a61]"><b className="text-[#1f4138]">Entrepreneurs</b> get a clearer picture of the steps and institutions behind cross-border trade.</p>
@@ -232,7 +233,7 @@ export function PublicLanding() {
         <div className="grid gap-8 px-6 py-9 sm:px-10 sm:py-12 lg:grid-cols-[1fr_auto] lg:items-center lg:px-14">
           <div>
             <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.2em] text-[#a45e2f]">Your next step</p>
-            <h2 className="mt-4 font-serif-title text-3xl leading-tight tracking-[-.03em] text-[#193a34] sm:text-4xl">Make the process less opaque.</h2>
+            <h2 className="mt-4 font-serif-title text-3xl leading-tight tracking-[-.03em] text-[#193a34] sm:text-4xl">{t('Make the process less opaque.')}</h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#68746b]">Create an account to enter the academy. Membership is 3,900 ETB for 30 days; payment and access follow the existing subscription process.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
@@ -245,7 +246,7 @@ export function PublicLanding() {
       <footer className="border-t border-[#d9d8cc]">
         <div className="mx-auto flex max-w-[1320px] flex-col gap-4 px-5 py-7 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12">
           <Brand />
-          <p className="text-xs leading-5 text-[#788078]">Practical learning for Ethiopian import-export and logistics.</p>
+          <p className="text-xs leading-5 text-[#788078]">{t('Practical learning for Ethiopian import-export and logistics.')}</p>
           <div className="flex items-center gap-5 text-xs font-semibold text-[#52665c]"><Link href="/sign-in" className="hover:text-[#a45e2f]">Sign in</Link><Link href="/sign-up" className="hover:text-[#a45e2f]">Create account</Link></div>
         </div>
       </footer>

@@ -65,7 +65,7 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
             <div className="grid gap-6 border-t border-[#d9d8cc] pt-10 sm:grid-cols-[.8fr_1.2fr] sm:gap-12">
               <div>
                 <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.18em] text-[#a45e2f]">Explore the learning</p>
-                <h2 className="mt-3 max-w-md font-serif-title text-3xl leading-tight tracking-[-.035em] text-[#193a34] sm:text-4xl">Understand the full journey—not just one form.</h2>
+                <h2 className="mt-3 max-w-md font-serif-title text-3xl leading-tight tracking-[-.035em] text-[#193a34] sm:text-4xl">{t('Understand the full journey—not just one form.')}</h2>
                 <p className="mt-4 max-w-md text-sm leading-6 text-[#68746b]">Open a track to see what the academy covers, from preparing a trade file to clearing and moving goods.</p>
                 <a href="#account" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#1d5f52] transition hover:text-[#a45e2f]">
                   Create your learner account <ArrowUpRight className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function PublicAuthShell({ mode, children }: PublicAuthShellProps) {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="font-mono-numbers text-[10px] font-semibold uppercase tracking-[.18em] text-[#a45e2f]">Learn, practice, apply</p>
-                  <h2 className="mt-2 font-serif-title text-2xl font-bold text-[#193a34] sm:text-3xl">Tools for building practical understanding.</h2>
+                  <h2 className="mt-2 font-serif-title text-2xl font-bold text-[#193a34] sm:text-3xl">{t('Tools for building practical understanding.')}</h2>
                 </div>
                 <p className="max-w-md text-xs leading-5 text-[#68746b]">Membership is 3,900 ETB for 30 days. Payment is reviewed by the academy admin before access starts.</p>
               </div>

@@ -126,8 +126,8 @@ export const LearningDashboard: React.FC = () => {
 
         <aside className="space-y-6">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[.16em] academy-accent">Learn by doing</p>
-            <h2 className="mt-1 font-serif-title text-2xl font-bold tracking-tight">Practice with trade tools</h2>
+            <p className="text-[11px] font-bold uppercase tracking-[.16em] academy-accent">{t('Learn by doing')}</p>
+            <h2 className="mt-1 font-serif-title text-2xl font-bold tracking-tight">{t('Practice with trade tools')}</h2>
             <p className="mt-2 text-xs leading-5 academy-muted">Use the calculators alongside your lessons to connect concepts with working estimates.</p>
             <div className="mt-4 space-y-2.5">
               {toolLinks.map(({ tab, title, description, icon: Icon }) => (
@@ -142,7 +142,7 @@ export const LearningDashboard: React.FC = () => {
           <div className="rounded-2xl border border-[#e7d7c1] bg-[#fff8ee] p-4 dark:border-[#5a4934] dark:bg-[#30291f]">
             <div className="flex items-start gap-2.5">
               <span className="mt-0.5 h-2 w-2 rounded-full bg-[#b46d2e]" />
-              <div><h3 className="text-xs font-bold text-[#664627] dark:text-[#edc995]">Practice, then verify</h3><p className="mt-1 text-[11px] leading-5 text-[#735f49] dark:text-[#cbbb9f]">Tool outputs are educational estimates. Verify current regulations and exchange rates with the relevant authorities and financial institutions.</p></div>
+              <div><h3 className="text-xs font-bold text-[#664627] dark:text-[#edc995]">{t('Practice, then verify')}</h3><p className="mt-1 text-[11px] leading-5 text-[#735f49] dark:text-[#cbbb9f]">Tool outputs are educational estimates. Verify current regulations and exchange rates with the relevant authorities and financial institutions.</p></div>
             </div>
           </div>
         </aside>
