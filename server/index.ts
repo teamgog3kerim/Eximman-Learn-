@@ -1,6 +1,5 @@
 import express, { type NextFunction, type Request, type RequestHandler, type Response } from 'express';
 import cors from 'cors';
-import multer from 'multer';
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
@@ -17,7 +16,6 @@ const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 const PORT = Number(process.env.PORT || 5000);
 const ADMIN_EMAIL = 'teamgog3@gmail.com';
 const SUBSCRIPTION_PRICE_ETB = 3900;
-const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 const COURSE_CHAPTERS = COURSE_MODULES.flatMap(module => module.chapters);
 const COURSE_CHAPTERS_BY_ID = new Map(COURSE_CHAPTERS.map(chapter => [chapter.id, chapter]));
 
@@ -176,21 +174,6 @@ function requireSameOrigin(req: Request, res: Response, next: NextFunction) {
 app.use('/api', requireIdentity);
 app.use('/api', requireSameOrigin);
 
-const receiptUpload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: RECEIPT_MAX_BYTES, files: 1 },
-  fileFilter: (_req, file, callback) => {
-    callback(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype));
-  },
-});
-
-function sniffReceipt(buffer: Buffer): 'image/jpeg' | 'image/png' | 'image/webp' | null {
-  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return 'image/jpeg';
-  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'image/png';
-  if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
-  return null;
-}
-
 app.get('/api/me', async (_req, res) => {
   const identity = res.locals.identity as Identity;
   const subscription = await pool.query(
@@ -332,42 +315,47 @@ app.patch('/api/progress', asyncRoute(async (req, res) => {
 
 app.get('/api/payment-settings', async (_req, res) => {
   const result = await pool.query(
-    'SELECT telebirr_account_name, telebirr_account_number FROM academy_payment_settings WHERE id = 1',
+    'SELECT telebirr_account_name, telebirr_account_number, cbe_account_number FROM academy_payment_settings WHERE id = 1',
   );
   res.json({
     priceEtb: SUBSCRIPTION_PRICE_ETB,
-    accountName: result.rows[0]?.telebirr_account_name || '',
-    accountNumber: result.rows[0]?.telebirr_account_number || '',
+    telebirrAccountName: result.rows[0]?.telebirr_account_name || '',
+    telebirrAccountNumber: result.rows[0]?.telebirr_account_number || '',
+    cbeAccountNumber: result.rows[0]?.cbe_account_number || '1000342413904',
   });
 });
 
 app.get('/api/payment-requests', async (_req, res) => {
   const identity = res.locals.identity as Identity;
   const result = identity.isAdmin
-    ? await pool.query(`SELECT id, learner_email, amount_etb, telebirr_reference, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests ORDER BY submitted_at DESC LIMIT 300`)
-    : await pool.query(`SELECT id, amount_etb, telebirr_reference, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests WHERE clerk_user_id = $1 ORDER BY submitted_at DESC LIMIT 25`, [identity.userId]);
+    ? await pool.query(`SELECT id, learner_email, amount_etb, transaction_reference, payment_method, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests ORDER BY submitted_at DESC LIMIT 300`)
+    : await pool.query(`SELECT id, amount_etb, transaction_reference, payment_method, status, submitted_at, reviewed_at, expires_at, rejection_reason FROM academy_payment_requests WHERE clerk_user_id = $1 ORDER BY submitted_at DESC LIMIT 25`, [identity.userId]);
   res.json({ requests: result.rows });
 });
 
-app.post('/api/payment-requests', receiptUpload.single('screenshot'), async (req, res) => {
+app.post('/api/payment-requests', async (req, res) => {
   const identity = res.locals.identity as Identity;
   if (identity.isAdmin) return res.status(400).json({ error: 'Administrators do not need a learner subscription.' });
-  if (!req.file || !req.body?.telebirrReference?.trim()) {
-    return res.status(400).json({ error: 'Add the Telebirr reference and a screenshot to continue.' });
+  const paymentMethod = req.body?.paymentMethod;
+  const reference = String(req.body?.transactionReference || '').trim();
+  if (!['telebirr', 'cbe'].includes(paymentMethod)) {
+    return res.status(400).json({ error: 'Choose Telebirr or CBE as your payment method.' });
+  }
+  if (!reference) {
+    return res.status(400).json({ error: 'Enter the transaction reference to continue.' });
   }
   if (Number(req.body.amountEtb) !== SUBSCRIPTION_PRICE_ETB) {
     return res.status(400).json({ error: `Subscription requests must be ${SUBSCRIPTION_PRICE_ETB} ETB.` });
   }
-  const actualMime = sniffReceipt(req.file.buffer);
-  if (!actualMime || actualMime !== req.file.mimetype) {
-    return res.status(400).json({ error: 'Upload a valid JPG, PNG, or WebP receipt image.' });
+  if (!/^[a-zA-Z0-9-]{3,80}$/.test(reference)) {
+    return res.status(400).json({ error: 'The transaction reference can contain letters, numbers, and dashes.' });
   }
-  if (!/^[a-zA-Z0-9-]{3,80}$/.test(req.body.telebirrReference.trim())) {
-    return res.status(400).json({ error: 'The Telebirr reference can contain letters, numbers, and dashes.' });
-  }
-  const settings = await pool.query('SELECT telebirr_account_number FROM academy_payment_settings WHERE id = 1');
-  if (!settings.rows[0]?.telebirr_account_number) {
-    return res.status(409).json({ error: 'Telebirr payment details are not set up yet. Please check back later.' });
+  const settings = await pool.query('SELECT telebirr_account_number, cbe_account_number FROM academy_payment_settings WHERE id = 1');
+  const recipientConfigured = paymentMethod === 'cbe'
+    ? Boolean(settings.rows[0]?.cbe_account_number)
+    : Boolean(settings.rows[0]?.telebirr_account_number);
+  if (!recipientConfigured) {
+    return res.status(409).json({ error: 'The selected payment account is not set up yet. Please choose another method or check back later.' });
   }
   const pending = await pool.query(
     `SELECT id FROM academy_payment_requests WHERE clerk_user_id = $1 AND status = 'pending' LIMIT 1`,
@@ -376,10 +364,10 @@ app.post('/api/payment-requests', receiptUpload.single('screenshot'), async (req
   if (pending.rowCount) return res.status(409).json({ error: 'You already have a payment request waiting for review.' });
   const result = await pool.query(
     `INSERT INTO academy_payment_requests
-      (clerk_user_id, learner_email, amount_etb, telebirr_reference, screenshot_mime, screenshot_data)
-     VALUES ($1,$2,$3,$4,$5,$6)
-     RETURNING id, amount_etb, telebirr_reference, status, submitted_at`,
-    [identity.userId, identity.email, SUBSCRIPTION_PRICE_ETB, req.body.telebirrReference.trim(), actualMime, req.file.buffer],
+      (clerk_user_id, learner_email, amount_etb, transaction_reference, payment_method)
+     VALUES ($1,$2,$3,$4,$5)
+     RETURNING id, amount_etb, transaction_reference, payment_method, status, submitted_at`,
+    [identity.userId, identity.email, SUBSCRIPTION_PRICE_ETB, reference, paymentMethod],
   );
   res.status(201).json({ request: result.rows[0] });
 });
@@ -410,31 +398,32 @@ app.get('/api/admin/users', requireAdmin, async (_req, res) => {
 });
 
 app.get('/api/admin/payment-settings', requireAdmin, async (_req, res) => {
-  const result = await pool.query('SELECT telebirr_account_name, telebirr_account_number FROM academy_payment_settings WHERE id = 1');
-  res.json({ accountName: result.rows[0]?.telebirr_account_name || '', accountNumber: result.rows[0]?.telebirr_account_number || '' });
+  const result = await pool.query('SELECT telebirr_account_name, telebirr_account_number, cbe_account_number FROM academy_payment_settings WHERE id = 1');
+  res.json({
+    telebirrAccountName: result.rows[0]?.telebirr_account_name || '',
+    telebirrAccountNumber: result.rows[0]?.telebirr_account_number || '',
+    cbeAccountNumber: result.rows[0]?.cbe_account_number || '1000342413904',
+  });
 });
 
 app.put('/api/admin/payment-settings', requireAdmin, async (req, res) => {
-  const name = String(req.body?.accountName || '').trim();
-  const number = String(req.body?.accountNumber || '').replace(/\s/g, '');
-  if (name.length < 2 || name.length > 100 || !/^\+?[0-9]{9,15}$/.test(number)) {
-    return res.status(400).json({ error: 'Enter the Telebirr account name and a valid number.' });
+  const name = String(req.body?.telebirrAccountName || '').trim();
+  const telebirrNumber = String(req.body?.telebirrAccountNumber || '').replace(/\s/g, '');
+  const cbeNumber = String(req.body?.cbeAccountNumber || '').replace(/\s/g, '');
+  const hasTelebirrDetails = Boolean(name || telebirrNumber);
+  if (hasTelebirrDetails && (name.length < 2 || name.length > 100 || !/^\+?[0-9]{9,15}$/.test(telebirrNumber))) {
+    return res.status(400).json({ error: 'Enter both a valid Telebirr account name and number, or leave both empty.' });
+  }
+  if (!/^[0-9]{8,20}$/.test(cbeNumber)) {
+    return res.status(400).json({ error: 'Enter a valid CBE account number.' });
   }
   await pool.query(
-    `UPDATE academy_payment_settings SET telebirr_account_name = $1, telebirr_account_number = $2, updated_at = now() WHERE id = 1`,
-    [name, number],
+    `UPDATE academy_payment_settings
+     SET telebirr_account_name = $1, telebirr_account_number = $2, cbe_account_number = $3, updated_at = now()
+     WHERE id = 1`,
+    [name, telebirrNumber, cbeNumber],
   );
   res.json({ success: true });
-});
-
-app.get('/api/admin/payment-requests/:id/screenshot', requireAdmin, async (req, res) => {
-  const result = await pool.query(
-    'SELECT screenshot_mime, screenshot_data FROM academy_payment_requests WHERE id = $1',
-    [req.params.id],
-  );
-  if (!result.rowCount) return res.status(404).json({ error: 'Receipt not found.' });
-  res.setHeader('Cache-Control', 'private, no-store');
-  res.type(result.rows[0].screenshot_mime).send(result.rows[0].screenshot_data);
 });
 
 app.post('/api/admin/payment-requests/:id/review', requireAdmin, async (req, res) => {
@@ -457,9 +446,6 @@ app.post('/api/admin/payment-requests/:id/review', requireAdmin, async (req, res
 });
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-    return res.status(413).json({ error: 'Receipt images must be smaller than 5 MB.' });
-  }
   console.error('Request failed.', error);
   res.status(500).json({ error: 'The request could not be completed. Try again later.' });
 });

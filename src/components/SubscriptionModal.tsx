@@ -23,7 +23,7 @@ export const SubscriptionModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
         <div role="note" className="flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
           <CreditCard className="mt-1 h-4 w-4 shrink-0" />
-          <p>Pay 3,900 ETB with Telebirr and submit your receipt. The academy admin will review the payment and enable access for 30 days after approval.</p>
+          <p>Pay 3,900 ETB with Telebirr or CBE, then submit your transaction reference. The academy admin will verify it and approve 30 days of access.</p>
         </div>
         <button type="button" onClick={() => { onClose(); setActiveNavTab('subscription'); }} className="min-h-11 w-full rounded-xl bg-[#174f49] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#12413c]">Continue to payment instructions</button>
       </section>

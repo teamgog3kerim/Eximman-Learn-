@@ -87,7 +87,7 @@ const MainContent: React.FC = () => {
         )}
         {isSubscription && (
           <div role="note" className="mb-5 rounded-xl border border-[#e8d6be] bg-[#fff8ee] px-4 py-3 text-xs leading-5 text-[#705634] dark:border-[#574633] dark:bg-[#30291f] dark:text-[#ddc59f]">
-            Send payment only to the academy account shown below. Uploading a receipt does not grant access until the admin approves it.
+            Pay only to the academy account shown below. Your transaction reference must be verified by the admin before access is approved.
           </div>
         )}
         {(activeNavTab as string) === 'overview' && <LearningDashboard />}
