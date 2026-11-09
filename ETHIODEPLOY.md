@@ -1,21 +1,27 @@
-# EthioDeploy deployment
+# EthioDeploy fresh deployment
 
-This project is a Node.js/Express web service with a Vite-built React frontend and PostgreSQL-backed learner data. Use `npx --yes --package=npm@10.9.4 npm install --no-audit --no-fund --package-lock=true` as the install command. The build pins npm 10.9.4 because EthioDeploy's Nixpacks image selected npm 9.9.4, which crashed during installation with “Exit handler never called.” The build-time CLI `esbuild` is a regular dependency so it is installed even when EthioDeploy sets `NODE_ENV=production`; Vite and its build plugins are also listed as regular dependencies. EthioDeploy's Build & Deploy settings override the repository config, so verify the command shown in the generated Nixpacks plan.
+This is a Node.js/Express service with a Vite-built React frontend and PostgreSQL-backed learner data. Follow these steps when creating a new EthioDeploy project.
 
-In EthioDeploy's **Build & Deploy → Install Command** field, set `npx --yes --package=npm@10.9.4 npm install --no-audit --no-fund --package-lock=true`. The latest log confirmed Nixpacks was using Node 22.11.0 and npm 9.9.4; npm 9 then exited with “Exit handler never called” during install. This command runs the install with pinned npm 10.9.4 and retains the lockfile. The Docker warning about `$NIXPACKS_PATH` is separate.
-- Build: `npm run build`
-- Start: `npm start`
-- Runtime: Node.js 22
+## Before deleting the old project
 
-The install command retains `package-lock.json`; audit and funding requests are kept out of the install path and should be run separately. Set Build to `npm run build` and Start to `npm start`. Verify the generated Nixpacks plan contains the exact install command above; the dashboard override takes precedence over `nixpacks.toml`. `.replit`, `replit.nix`, and `replit.md` are Replit-only configuration.
+Deleting an EthioDeploy project or its attached database may permanently erase learner progress, payment requests, and account history. Export or back up any data you need before deleting it. A fresh PostgreSQL database starts empty; GitHub contains the app code, not the old database contents.
 
-## Create the EthioDeploy project
+## Create and configure the new project
 
-1. Push this repository to GitHub and create a Web Service project from the repository in EthioDeploy.
-2. Add a managed PostgreSQL add-on. It supplies `DATABASE_URL`; the app runs the idempotent SQL migrations in `server/migrations/` before it starts serving traffic.
-3. Set the health-check path to `/healthz`. It checks the database and returns `{"status":"ok"}` only when the service can reach it.
-4. Configure the project's environment variables (see below), then deploy from the trusted default branch.
-5. The default public URL is `https://<project-slug>.ethiodeploy.app`. Configure Clerk with the actual project URL after the slug is known.
+1. Push the latest `main` branch to GitHub and create a new EthioDeploy **Web Service** connected to that repository and branch.
+2. Add a managed PostgreSQL database and attach its `DATABASE_URL` to the service. The server runs the idempotent SQL files in `server/migrations/` at startup; do not run the migrations manually.
+3. In **Build & Deploy**, use Node.js 22 and set:
+   - Install: `npx --yes --package=npm@10.9.4 npm install --no-audit --no-fund --package-lock=true`
+   - Build: `npm run build`
+   - Start: `npm start`
+   - Health check: `/healthz`
+4. Set the environment variables below in EthioDeploy's encrypted settings. `VITE_CLERK_PUBLISHABLE_KEY` and `VITE_CLERK_PROXY_URL` must be available during the build as well as at runtime.
+5. Configure Clerk as described below. After EthioDeploy assigns the public domain, add that exact domain to the production Clerk instance's allowed origins/domains and redirect URLs.
+6. Deploy from `main`. Confirm the generated Nixpacks plan uses the pinned npm 10.9.4 install command, the build completes, and `/healthz` returns HTTP 200 with `{"status":"ok"}`.
+7. Sign in with the academy administrator account, check the admin workspace, and update and verify the CBE and Telebirr recipient details before telling learners to pay. The current administrator allowlist is `teamgog3@gmail.com`.
+8. Smoke-test the public page, sign-in, course images and chapters, quizzes, progress save/reload, certificates, calculators, Amharic language selection, and payment request review. Use a test transaction reference; do not make a real payment as a deployment test.
+
+The pinned install command is necessary because a prior Nixpacks build selected npm 9.9.4 and exited with “Exit handler never called.” npm 10.9.4 supports the Node 22.11.0 runtime shown in that build log. EthioDeploy's dashboard settings can override `nixpacks.toml`; if the generated plan still shows a different install command, update the dashboard field. The Docker warning about `$NIXPACKS_PATH` is separate from the npm failure. `.replit` and `replit.md` configure the Replit workspace, not EthioDeploy.
 
 ## Required environment variables
 

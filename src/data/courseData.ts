@@ -16,7 +16,7 @@ export const COURSE_MODULES: Module[] = [
         description: 'Understand NBE foreign exchange regulations, priority allocation lists, foreign currency regimes, and key institutional stakeholders.',
         estimatedMinutes: 20,
         isFreeTrialAccessible: true,
-        imageUrl: '/src/assets/images/esw_portal_interface_1791465102377.jpg',
+        imageUrl: '/images/esw_portal_interface_1791465102377.jpg',
         imageCaption: 'Ethiopian foreign trade specialist filing electronic import declarations and proforma clearances at the Ethiopian Single Window (ESW) terminal in Addis Ababa.',
         diagramType: 'esw_process',
         sections: [
@@ -214,7 +214,7 @@ Instead of visiting dozens of ministries, traders submit electronic declarations
         description: 'Complete hands-on guide to filing electronic declarations (e-SAD), automated bank forex permit validations, Other Government Agencies (OGA) clearances, and digital customs release orders.',
         estimatedMinutes: 30,
         isFreeTrialAccessible: false,
-        imageUrl: '/src/assets/images/esw_portal_interface_1791465102377.jpg',
+        imageUrl: '/images/esw_portal_interface_1791465102377.jpg',
         imageCaption: 'Foreign trade operator in Addis Ababa preparing and validating an electronic Single Administrative Document (e-SAD) on the national Ethiopian Single Window portal (trade.esw.et).',
         diagramType: 'esw_process',
         sections: [
@@ -734,7 +734,7 @@ Why the 1.10 multiplier? The international maritime standard specifies coverage 
         description: 'Port charges at Djibouti, transit corridor logistics, container demurrage traps, and inland transport tariffs to Addis Ababa and Indode.',
         estimatedMinutes: 30,
         isFreeTrialAccessible: false,
-        imageUrl: '/src/assets/images/djibouti_ethio_corridor_1791465115861.jpg',
+        imageUrl: '/images/djibouti_ethio_corridor_1791465115861.jpg',
         imageCaption: 'Heavy commercial container trucks navigating the primary Djibouti to Ethiopia trade highway corridor past the Galafi border transit checkpoint.',
         diagramType: 'corridor_flow',
         sections: [
@@ -821,7 +821,7 @@ Shipping lines grant 14 to 21 free days for container return. If customs clearan
         description: 'Strategic comparison of maritime transit gateways: Port of Djibouti (Doraleh), DP World Berbera Port, and the Kenyan Lamu LAPSSET corridor, including road freight tariffs and transit agreements.',
         estimatedMinutes: 25,
         isFreeTrialAccessible: false,
-        imageUrl: '/src/assets/images/djibouti_ethio_corridor_1791465115861.jpg',
+        imageUrl: '/images/djibouti_ethio_corridor_1791465115861.jpg',
         imageCaption: 'Cross-border container transit convoy traversing the Eastern trade corridor toward inland customs distribution hubs in Ethiopia.',
         diagramType: 'port_comparison',
         sections: [
@@ -1231,7 +1231,7 @@ The **Post-Clearance Audit (PCA) Directorate** of the Ethiopian Customs Commissi
         description: 'End-to-end export mechanics: ECX bidding, quality grading at Coffee & Tea Authority, export permit approval, and shipment via Djibouti.',
         estimatedMinutes: 25,
         isFreeTrialAccessible: false,
-        imageUrl: '/src/assets/images/ethiopian_coffee_grading_1791465129363.jpg',
+        imageUrl: '/images/ethiopian_coffee_grading_1791465129363.jpg',
         imageCaption: 'Specialty coffee cupping, physical defect grading, and moisture analysis at the Ethiopian Coffee and Tea Authority laboratory in Addis Ababa prior to export permit clearance.',
         diagramType: 'export_retention',
         sections: [
@@ -1405,7 +1405,7 @@ The **Post-Clearance Audit (PCA) Directorate** of the Ethiopian Customs Commissi
         description: 'Examine every single row of Page 1 & 2 of the PDF: FOB, Freight, C&F, Marine Insurance, Bank Charges, Taxes, Port clearance, and Assembly.',
         estimatedMinutes: 35,
         isFreeTrialAccessible: false,
-        imageUrl: '/src/assets/images/mojo_dry_port_machinery_1791465141249.jpg',
+        imageUrl: '/images/mojo_dry_port_machinery_1791465141249.jpg',
         imageCaption: 'Commercial fleet of heavy duty Sino dump trucks and excavators staged at Mojo Dry Port customs inspection yard following corridor transit from Djibouti.',
         diagramType: 'lc_lifecycle',
         sections: [
